@@ -38,6 +38,10 @@ async function desktopFlow(browser) {
   await page.locator("#demo").waitFor();
   assert.match(await page.title(), /KAV/);
   assert.equal(await page.locator("html").getAttribute("dir"), "ltr");
+  const telegramContact = page.locator('a[href="https://t.me/Liraagi"]');
+  assert.equal(await telegramContact.count(), 1);
+  assert.match(await telegramContact.textContent(), /Лире в Telegram/);
+  assert.equal(await telegramContact.getAttribute("rel"), "noopener noreferrer");
 
   const initialOverflow = await page.evaluate(() => ({
     viewport: window.innerWidth,
@@ -81,6 +85,7 @@ async function desktopFlow(browser) {
   assert.equal(await page.locator("html").getAttribute("lang"), "he");
   assert.equal(await page.locator(".nav-links").getAttribute("aria-label"), "ניווט ראשי");
   assert.equal(await page.locator(".price-main").getAttribute("dir"), "ltr");
+  assert.match(await telegramContact.textContent(), /לירה בטלגרם/);
 
   await page.locator('[data-scenario="handoff"]').click();
   await page.locator('[data-choice="shoulder"]').click();

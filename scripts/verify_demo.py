@@ -41,6 +41,8 @@ REQUIRED_TEXT = {
     'query.get("profile") === "dental"',
     "медицинских советов я не даю",
     "איני נותנת ייעוץ רפואי",
+    "https://t.me/Liraagi",
+    "telegramContact",
 }
 
 
