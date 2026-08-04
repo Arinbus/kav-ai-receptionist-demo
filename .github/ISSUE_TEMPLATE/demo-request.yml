@@ -1,0 +1,61 @@
+name: Tailored demo request
+description: Request a short RU/HE AI receptionist walkthrough for a local business
+title: "Demo request: "
+labels:
+  - demo-request
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for your interest. Please share only public business information. Do not post customer, patient, employee, account, or credential data.
+  - type: input
+    id: business
+    attributes:
+      label: Business name
+      description: Public trading name only.
+      placeholder: Example Studio
+    validations:
+      required: true
+  - type: input
+    id: public_url
+    attributes:
+      label: Public website or business page
+      placeholder: https://example.com
+    validations:
+      required: true
+  - type: dropdown
+    id: channel
+    attributes:
+      label: First channel to demonstrate
+      options:
+        - WhatsApp Business
+        - Telegram
+        - Website chat
+        - Not sure yet
+    validations:
+      required: true
+  - type: checkboxes
+    id: languages
+    attributes:
+      label: Languages
+      options:
+        - label: Hebrew
+        - label: Russian
+        - label: English
+    validations:
+      required: true
+  - type: textarea
+    id: process
+    attributes:
+      label: One process to demonstrate
+      description: Describe the administrative flow only, such as new booking, reschedule, callback request, or lead qualification.
+      placeholder: After-hours appointment request and owner callback.
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety confirmation
+      options:
+        - label: I have not included private customer, patient, employee, account, or credential data.
+          required: true

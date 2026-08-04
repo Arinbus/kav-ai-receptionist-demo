@@ -1,0 +1,1658 @@
+<!doctype html>
+<html lang="ru" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Локальный интерактивный RU/HE demo AI-рецепциониста для салона в Израиле: квалификация, заявка, human handoff, таблица лидов и сводка владельцу.">
+  <meta name="color-scheme" content="light">
+  <title>KAV / קו — demo AI-рецепциониста</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2317221d'/%3E%3Cpath d='M17 18v28M18 34l13-16M19 33l14 13M38 18v28M38 18h9' stroke='%23f6f1e7' stroke-width='6' fill='none'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --paper: #f4efe5;
+      --paper-deep: #e9e1d3;
+      --surface: #fffdf8;
+      --surface-2: #faf7f0;
+      --ink: #17221d;
+      --ink-soft: #39463f;
+      --muted: #69736d;
+      --line: #d9d0c1;
+      --line-dark: #b9b0a2;
+      --accent: #c95731;
+      --accent-dark: #963a1d;
+      --accent-soft: #f8dfd4;
+      --green: #23694f;
+      --green-soft: #dcece4;
+      --amber: #945f16;
+      --amber-soft: #f2e6ca;
+      --blue: #2e6d87;
+      --blue-soft: #deebf0;
+      --danger: #9b3f32;
+      --shadow: 0 18px 48px rgba(40, 33, 22, .10);
+      --shadow-small: 0 8px 24px rgba(40, 33, 22, .08);
+      --radius: 16px;
+      --max: 1240px;
+      --body: "Trebuchet MS", "Arial Hebrew", Arial, sans-serif;
+      --display: Georgia, "Times New Roman", "Arial Hebrew", serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(rgba(23, 34, 29, .024) 1px, transparent 1px),
+        var(--paper);
+      background-size: 100% 32px;
+      font-family: var(--body);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .38;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");
+      z-index: 1000;
+    }
+    button, input, a { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { color: inherit; }
+    a { color: inherit; }
+    [hidden] { display: none !important; }
+    :focus-visible { outline: 3px solid rgba(201, 87, 49, .38); outline-offset: 3px; }
+
+    .wrap { width: min(var(--max), calc(100% - 48px)); margin-inline: auto; }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .demo-notice {
+      background: var(--ink);
+      color: #f8f4ec;
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 7px 18px;
+      font-size: 12px;
+      letter-spacing: .025em;
+      text-align: center;
+    }
+    .demo-notice strong { color: #f0a082; text-transform: uppercase; letter-spacing: .12em; }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(244, 239, 229, .94);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+    .nav {
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      white-space: nowrap;
+    }
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 9px;
+      background: var(--ink);
+      color: var(--surface);
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: -.08em;
+    }
+    .brand-sub { color: var(--muted); font-size: 12px; font-weight: 400; margin-inline-start: 3px; }
+    .nav-links { display: flex; align-items: center; gap: 24px; }
+    .nav-links a {
+      color: var(--ink-soft);
+      text-decoration: none;
+      font-size: 14px;
+      border-bottom: 1px solid transparent;
+    }
+    .nav-links a:hover { border-color: var(--ink); }
+    .nav-actions { display: flex; align-items: center; gap: 8px; }
+    .lang-switch {
+      display: inline-flex;
+      border: 1px solid var(--line-dark);
+      border-radius: 10px;
+      background: var(--surface);
+      padding: 3px;
+    }
+    .lang-button {
+      min-width: 50px;
+      min-height: 36px;
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .lang-button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+
+    .button {
+      min-height: 46px;
+      border-radius: 10px;
+      padding: 0 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      color: var(--surface);
+      text-decoration: none;
+      cursor: pointer;
+      font-weight: 700;
+      transition: transform .16s ease, box-shadow .16s ease, background .16s ease;
+    }
+    .button:hover { transform: translateY(-2px); box-shadow: var(--shadow-small); }
+    .button.secondary { background: transparent; color: var(--ink); }
+    .button.secondary:hover { background: var(--surface); }
+    .button.accent { background: var(--accent); border-color: var(--accent); }
+    .button.accent:hover { background: var(--accent-dark); }
+    .button.small { min-height: 44px; padding: 0 13px; font-size: 13px; border-radius: 8px; }
+    .button:disabled { opacity: .55; cursor: not-allowed; transform: none; box-shadow: none; }
+    .arrow { font-family: var(--mono); font-size: 16px; }
+
+    .hero { padding: 72px 0 54px; border-bottom: 1px solid var(--line); }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(360px, .85fr);
+      gap: 76px;
+      align-items: center;
+    }
+    .eyebrow {
+      margin: 0 0 18px;
+      color: var(--accent-dark);
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.4;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    h1, h2, h3, p { text-wrap: pretty; }
+    h1 {
+      max-width: 800px;
+      margin: 0;
+      font-family: var(--display);
+      font-size: clamp(48px, 6.1vw, 78px);
+      font-weight: 400;
+      line-height: .98;
+      letter-spacing: -.045em;
+    }
+    h1 em { color: var(--accent); font-style: italic; }
+    .hero-lead {
+      max-width: 690px;
+      margin: 26px 0 0;
+      color: var(--ink-soft);
+      font-size: clamp(18px, 2vw, 22px);
+      line-height: 1.45;
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
+    .truth-line {
+      margin: 22px 0 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .truth-line li::before { content: "—"; margin-inline-end: 7px; color: var(--accent); }
+
+    .pitch-card {
+      background: var(--surface);
+      border: 1px solid var(--line-dark);
+      border-radius: var(--radius);
+      padding: 26px;
+      box-shadow: var(--shadow);
+      transform: rotate(.35deg);
+    }
+    .pitch-card:hover { transform: rotate(0); }
+    .pitch-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+    .pitch-label { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+    .pitch-title { margin: 4px 0 0; font-family: var(--display); font-size: 28px; line-height: 1.08; font-weight: 400; }
+    .local-chip { border: 1px solid var(--green); color: var(--green); padding: 5px 8px; border-radius: 999px; font: 700 10px/1 var(--mono); white-space: nowrap; }
+    .pitch-form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+    .field { display: grid; gap: 6px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { font-size: 12px; color: var(--muted); font-weight: 700; }
+    .field input {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line-dark);
+      border-radius: 8px;
+      padding: 0 12px;
+      background: var(--surface-2);
+      color: var(--ink);
+    }
+    .pitch-foot { margin-top: 13px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .local-note { color: var(--muted); font-size: 11px; line-height: 1.35; }
+
+    .path-strip { background: var(--surface); border-bottom: 1px solid var(--line); }
+    .path-grid { display: grid; grid-template-columns: 1.1fr repeat(4, 1fr); }
+    .path-intro, .path-step { min-height: 118px; padding: 22px 18px; border-inline-end: 1px solid var(--line); }
+    .path-intro { padding-inline-start: 0; display: flex; flex-direction: column; justify-content: center; }
+    .path-step:last-child { border-inline-end: 0; }
+    .path-kicker { font: 700 11px/1.3 var(--mono); color: var(--accent-dark); letter-spacing: .08em; text-transform: uppercase; }
+    .path-intro strong { display: block; margin-top: 7px; font-family: var(--display); font-size: 22px; font-weight: 400; line-height: 1.15; }
+    .path-no { display: block; color: var(--accent); font: 700 11px/1 var(--mono); margin-bottom: 26px; }
+    .path-step strong { font-size: 14px; }
+    .path-step span { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; }
+
+    .section { padding: 82px 0; border-bottom: 1px solid var(--line); }
+    .section-heading { display: grid; grid-template-columns: .7fr 1.3fr; gap: 70px; align-items: end; margin-bottom: 34px; }
+    .section-number { color: var(--accent); font: 700 12px/1 var(--mono); letter-spacing: .08em; }
+    h2 { margin: 0; font-family: var(--display); font-size: clamp(38px, 5vw, 58px); font-weight: 400; line-height: 1.02; letter-spacing: -.035em; }
+    .section-heading p { max-width: 650px; margin: 14px 0 0; color: var(--muted); font-size: 16px; }
+
+    .demo-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px;
+      border: 1px solid var(--line-dark);
+      border-bottom: 0;
+      border-radius: 14px 14px 0 0;
+      background: var(--surface-2);
+    }
+    .scenario-switch { display: flex; align-items: center; gap: 7px; }
+    .scenario-button {
+      min-height: 44px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 0 14px;
+      background: transparent;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .scenario-button[aria-pressed="true"] { color: var(--ink); background: var(--surface); border-color: var(--line-dark); box-shadow: 0 2px 8px rgba(36, 30, 20, .07); }
+    .scenario-meta { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 12px; }
+    .reset-button { border: 0; background: transparent; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; color: var(--muted); min-height: 44px; }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1.04fr) minmax(420px, .96fr);
+      min-height: 640px;
+      border: 1px solid var(--line-dark);
+      border-radius: 0 0 14px 14px;
+      overflow: hidden;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+    .client-side { min-width: 0; display: flex; flex-direction: column; background: #eee8dc; border-inline-end: 1px solid var(--line-dark); }
+    .panel-top {
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .channel-identity { display: flex; align-items: center; gap: 11px; min-width: 0; }
+    .channel-mark {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--green-soft);
+      color: var(--green);
+      font: 800 12px/1 var(--mono);
+      flex: 0 0 auto;
+    }
+    .channel-mark.telegram { color: var(--blue); background: var(--blue-soft); }
+    .channel-title { font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .channel-sub { color: var(--muted); font-size: 11px; }
+    .sim-chip { border: 1px solid var(--line-dark); border-radius: 999px; padding: 5px 8px; color: var(--muted); font: 700 9px/1 var(--mono); letter-spacing: .07em; text-transform: uppercase; }
+
+    .chat-log {
+      flex: 1;
+      min-height: 420px;
+      max-height: 500px;
+      overflow-y: auto;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      scroll-behavior: smooth;
+      background:
+        radial-gradient(circle at 12px 12px, rgba(23, 34, 29, .04) 1px, transparent 1.5px),
+        #eee8dc;
+      background-size: 24px 24px;
+    }
+    .message { max-width: 82%; animation: message-in .2s ease both; }
+    .message.assistant { align-self: flex-start; }
+    .message.customer { align-self: flex-end; }
+    .message.system { align-self: stretch; max-width: 100%; }
+    .speaker { display: block; margin: 0 7px 4px; color: var(--muted); font: 700 9px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+    .bubble { padding: 11px 13px; border: 1px solid var(--line-dark); border-radius: 4px 13px 13px 13px; background: var(--surface); font-size: 14px; line-height: 1.46; box-shadow: 0 3px 8px rgba(43, 35, 24, .05); }
+    .customer .bubble { color: #fff; background: var(--ink); border-color: var(--ink); border-radius: 13px 4px 13px 13px; }
+    .system .bubble { border-color: #9bbdab; background: var(--green-soft); color: #174d39; border-radius: 8px; text-align: center; font-size: 12px; box-shadow: none; }
+    .ai-disclosure { color: var(--accent-dark); font-weight: 700; }
+    @keyframes message-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+    .quick-replies { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 16px 4px; background: var(--surface); }
+    .quick-button {
+      min-height: 44px;
+      padding: 7px 12px;
+      border: 1px solid var(--accent);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--accent-dark);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .quick-button:hover { background: var(--accent-soft); }
+    .composer { display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 12px 16px 16px; background: var(--surface); }
+    .composer input { min-width: 0; min-height: 44px; border: 1px solid var(--line-dark); border-radius: 10px; padding: 0 13px; color: var(--ink); background: var(--surface-2); }
+    .send-button { width: 46px; height: 44px; border: 0; border-radius: 10px; background: var(--accent); color: white; cursor: pointer; font: 700 18px/1 var(--mono); }
+
+    .owner-side { min-width: 0; display: flex; flex-direction: column; background: var(--surface); }
+    .owner-brand { display: flex; align-items: center; gap: 10px; }
+    .owner-wordmark { font-family: var(--mono); font-size: 13px; font-weight: 800; letter-spacing: -.03em; }
+    .owner-status { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 11px; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 3px var(--green-soft); }
+    .owner-tabs { display: flex; gap: 3px; padding: 8px 12px; border-bottom: 1px solid var(--line); background: var(--surface-2); overflow-x: auto; }
+    .owner-tab { min-height: 44px; border: 0; border-radius: 7px; background: transparent; padding: 0 13px; color: var(--muted); cursor: pointer; white-space: nowrap; font-size: 12px; font-weight: 700; }
+    .owner-tab[aria-selected="true"] { color: var(--ink); background: var(--surface); box-shadow: 0 2px 7px rgba(40, 33, 22, .08); }
+    .owner-view { flex: 1; min-height: 0; padding: 18px; overflow: auto; }
+
+    .inbox-label { margin: 0 0 9px; color: var(--muted); font: 700 10px/1.2 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+    .queue { display: grid; gap: 7px; margin-bottom: 18px; }
+    .queue-item {
+      width: 100%;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: center;
+      min-height: 58px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface-2);
+      padding: 9px 11px;
+      text-align: start;
+      cursor: pointer;
+    }
+    .queue-item.active { border-color: var(--ink); background: var(--surface); }
+    .queue-id { font: 700 10px/1 var(--mono); color: var(--muted); }
+    .queue-copy strong { display: block; font-size: 12px; }
+    .queue-copy span { display: block; margin-top: 2px; color: var(--muted); font-size: 10px; }
+    .channel-mini { width: 27px; height: 27px; display: grid; place-items: center; border-radius: 50%; background: var(--green-soft); color: var(--green); font: 800 8px/1 var(--mono); }
+    .channel-mini.telegram { background: var(--blue-soft); color: var(--blue); }
+
+    .lead-card { border: 1px solid var(--line-dark); border-radius: 12px; overflow: hidden; }
+    .lead-card-head { display: flex; justify-content: space-between; gap: 14px; align-items: flex-start; padding: 15px; background: var(--ink); color: var(--surface); }
+    .lead-card-head h3 { margin: 2px 0 0; font-family: var(--display); font-size: 22px; font-weight: 400; line-height: 1.1; }
+    .lead-id { color: #bfc8c2; font: 700 9px/1 var(--mono); letter-spacing: .09em; }
+    .status-pill { display: inline-flex; align-items: center; min-height: 25px; border-radius: 999px; padding: 0 8px; background: var(--amber-soft); color: #67400b; font-size: 9px; font-weight: 800; white-space: nowrap; }
+    .status-pill.handoff { background: var(--accent-soft); color: var(--accent-dark); }
+    .status-pill.owner { background: var(--green-soft); color: var(--green); }
+    .status-pill.qualifying { background: var(--blue-soft); color: var(--blue); }
+    .lead-fields { display: grid; grid-template-columns: 1fr 1fr; }
+    .lead-field { min-height: 76px; padding: 12px 14px; border-bottom: 1px solid var(--line); border-inline-end: 1px solid var(--line); }
+    .lead-field:nth-child(even) { border-inline-end: 0; }
+    .lead-field:nth-last-child(-n+2) { border-bottom: 0; }
+    .lead-field span { display: block; color: var(--muted); font-size: 9px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+    .lead-field strong { display: block; margin-top: 7px; font-size: 12px; line-height: 1.3; }
+    .lead-actions { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--line); background: var(--surface-2); }
+    .lead-actions .button { flex: 1; }
+
+    .table-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .table-toolbar h3, .summary-panel h3 { margin: 0; font-family: var(--display); font-size: 24px; font-weight: 400; }
+    .demo-data-label { color: var(--muted); font: 700 9px/1.3 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+    .table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+    table { width: 100%; border-collapse: collapse; min-width: 600px; font-size: 11px; }
+    th { padding: 10px; text-align: start; background: var(--surface-2); color: var(--muted); font: 700 9px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+    td { padding: 11px 10px; border-top: 1px solid var(--line); vertical-align: top; }
+    td strong { display: block; font-size: 11px; }
+    td span { display: block; color: var(--muted); font-size: 9px; margin-top: 2px; }
+
+    .summary-panel { display: grid; gap: 14px; }
+    .summary-box { border: 1px solid var(--line-dark); border-radius: 12px; padding: 18px; background: var(--surface-2); }
+    .summary-label { font: 700 10px/1.2 var(--mono); color: var(--accent-dark); letter-spacing: .08em; text-transform: uppercase; }
+    .summary-text { margin: 15px 0 0; font-size: 14px; line-height: 1.65; white-space: pre-line; }
+    .summary-counts { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+    .summary-count { padding: 13px; border-inline-end: 1px solid var(--line); }
+    .summary-count:last-child { border-inline-end: 0; }
+    .summary-count strong { display: block; font-family: var(--display); font-size: 27px; font-weight: 400; }
+    .summary-count span { display: block; color: var(--muted); font-size: 9px; line-height: 1.3; }
+    .not-client-metrics { margin: 0; color: var(--muted); font-size: 10px; }
+
+    .handoff-note {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 13px;
+      align-items: start;
+      padding: 15px;
+      border-top: 2px solid var(--accent);
+      background: var(--surface);
+    }
+    .handoff-note strong { display: block; font-size: 13px; }
+    .handoff-note p { margin: 4px 0 0; color: var(--muted); font-size: 11px; }
+    .handoff-symbol { color: var(--accent); font: 800 19px/1 var(--mono); }
+
+    .principles { display: grid; grid-template-columns: .8fr 1.2fr; gap: 80px; align-items: start; }
+    .principles-copy h2 { max-width: 470px; }
+    .principles-copy p { max-width: 520px; color: var(--muted); font-size: 17px; }
+    .rule-list { border-top: 1px solid var(--ink); }
+    .rule { display: grid; grid-template-columns: 34px 1fr; gap: 16px; padding: 21px 0; border-bottom: 1px solid var(--line-dark); }
+    .rule-no { color: var(--accent); font: 700 11px/1.4 var(--mono); }
+    .rule strong { font-size: 17px; }
+    .rule p { margin: 5px 0 0; color: var(--muted); font-size: 13px; }
+
+    .offer-section { background: var(--ink); color: #f8f3ea; border-bottom: 0; }
+    .offer-section .eyebrow { color: #f1a286; }
+    .offer-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 80px; align-items: start; }
+    .offer-for { color: #b9c2bd; font-size: 14px; margin: 0 0 14px; }
+    .offer-section h2 { max-width: 520px; }
+    .offer-copy { margin: 22px 0 0; max-width: 540px; color: #c6cdc9; font-size: 16px; }
+    .price-line { margin-top: 36px; padding-top: 22px; border-top: 1px solid #43504a; }
+    .price-main { font-family: var(--display); font-size: clamp(46px, 6vw, 72px); line-height: 1; letter-spacing: -.04em; }
+    .price-caption { margin-top: 7px; color: #b9c2bd; font-size: 12px; }
+    .support-price { margin-top: 20px; font-size: 19px; }
+    .support-price span { color: #b9c2bd; font-size: 12px; }
+    .offer-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 28px; }
+    .offer-section .button.secondary { border-color: #89948e; color: #f8f3ea; }
+    .offer-section .button.secondary:hover { background: #27342e; }
+    .copy-status { min-height: 20px; margin-top: 10px; color: #9ed7bd; font-size: 12px; }
+    .scope-sheet { border: 1px solid #4b5751; border-radius: 14px; overflow: hidden; background: #202c26; }
+    .scope-head { padding: 18px 20px; border-bottom: 1px solid #4b5751; display: flex; justify-content: space-between; gap: 16px; }
+    .scope-head strong { font-family: var(--display); font-size: 24px; font-weight: 400; }
+    .scope-head span { color: #aeb8b2; font: 700 9px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .06em; }
+    .scope-row { display: grid; grid-template-columns: 28px 1fr; gap: 12px; padding: 16px 20px; border-bottom: 1px solid #3e4a44; }
+    .scope-row:last-child { border-bottom: 0; }
+    .scope-check { color: #f1a286; font: 700 13px/1.4 var(--mono); }
+    .scope-row strong { display: block; font-size: 14px; }
+    .scope-row span { display: block; margin-top: 3px; color: #aeb8b2; font-size: 12px; }
+    .offer-fineprint { margin-top: 14px; color: #8f9b95; font-size: 11px; line-height: 1.5; }
+
+    footer { background: #101713; color: #9da8a2; padding: 24px 0; font-size: 11px; }
+    .footer-inner { display: flex; align-items: flex-start; justify-content: space-between; gap: 30px; }
+    .footer-inner p { margin: 0; max-width: 850px; }
+    .footer-code { font-family: var(--mono); white-space: nowrap; }
+
+    .toast {
+      position: fixed;
+      z-index: 100;
+      inset-inline-end: 20px;
+      bottom: 20px;
+      max-width: min(360px, calc(100% - 40px));
+      padding: 13px 16px;
+      border-radius: 10px;
+      background: var(--ink);
+      color: white;
+      box-shadow: var(--shadow);
+      font-size: 13px;
+      transform: translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .toast.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 1020px) {
+      .nav-links { display: none; }
+      .hero-grid, .principles, .offer-grid { grid-template-columns: 1fr; gap: 44px; }
+      .pitch-card { max-width: 680px; }
+      .path-grid { grid-template-columns: 1fr 1fr; }
+      .path-intro { grid-column: 1 / -1; min-height: 92px; border-bottom: 1px solid var(--line); }
+      .path-step:nth-child(3) { border-inline-end: 0; }
+      .path-step:nth-child(n+4) { border-top: 1px solid var(--line); }
+      .workspace { grid-template-columns: 1fr; }
+      .client-side { border-inline-end: 0; border-bottom: 1px solid var(--line-dark); }
+      .chat-log { min-height: 430px; max-height: 540px; }
+      .owner-side { min-height: 560px; }
+      .section-heading { grid-template-columns: 1fr; gap: 12px; }
+    }
+
+    @media (max-width: 640px) {
+      .wrap { width: min(var(--max), calc(100% - 28px)); }
+      .demo-notice { align-items: flex-start; text-align: start; font-size: 10px; }
+      .nav { min-height: 62px; }
+      .brand-sub, .nav-cta { display: none; }
+      .brand-mark { width: 33px; height: 33px; }
+      .lang-button { min-width: 44px; min-height: 44px; }
+      .hero { padding: 46px 0 42px; }
+      h1 { font-size: clamp(43px, 14vw, 60px); }
+      .hero-lead { font-size: 17px; }
+      .hero-actions { flex-direction: column; align-items: stretch; }
+      .hero-actions .button { width: 100%; }
+      .pitch-card { padding: 20px; transform: none; }
+      .pitch-form { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+      .pitch-foot { flex-direction: column; align-items: stretch; }
+      .path-grid { grid-template-columns: 1fr; }
+      .path-intro, .path-step { border-inline-end: 0; border-bottom: 1px solid var(--line); min-height: auto; padding: 18px 0; }
+      .path-step:nth-child(n+4) { border-top: 0; }
+      .path-no { margin-bottom: 12px; }
+      .section { padding: 62px 0; }
+      .demo-toolbar { align-items: stretch; flex-direction: column; border-radius: 12px 12px 0 0; }
+      .scenario-switch { display: grid; grid-template-columns: 1fr 1fr; }
+      .scenario-button { padding: 0 8px; }
+      .scenario-meta { justify-content: space-between; }
+      .workspace { border-radius: 0 0 12px 12px; }
+      .panel-top { padding: 11px 13px; }
+      .chat-log { padding: 16px 12px; min-height: 420px; }
+      .message { max-width: 90%; }
+      .quick-replies { padding-inline: 12px; }
+      .quick-button { width: 100%; border-radius: 9px; }
+      .composer { padding-inline: 12px; }
+      .owner-view { padding: 13px; }
+      .queue-item { grid-template-columns: auto 1fr; }
+      .queue-item .queue-id { display: none; }
+      .lead-fields { grid-template-columns: 1fr; }
+      .lead-field { min-height: auto; border-inline-end: 0; }
+      .lead-field:nth-last-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .lead-field:last-child { border-bottom: 0; }
+      .lead-actions { flex-direction: column; }
+      .summary-counts { grid-template-columns: 1fr; }
+      .summary-count { border-inline-end: 0; border-bottom: 1px solid var(--line); }
+      .summary-count:last-child { border-bottom: 0; }
+      .principles, .offer-grid { gap: 38px; }
+      .offer-actions { flex-direction: column; }
+      .offer-actions .button { width: 100%; }
+      .footer-inner { flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="demo-notice">
+    <strong data-i18n="noticeLabel">ДЕМО</strong>
+    <span data-i18n="noticeText">Локальная симуляция: реальные WhatsApp, Telegram, календарь и аккаунты не подключены.</span>
+  </div>
+
+  <header class="site-header">
+    <div class="wrap nav">
+      <a class="brand" href="#top" aria-label="KAV home">
+        <span class="brand-mark" aria-hidden="true">K/קו</span>
+        <span>KAV Reception <span class="brand-sub" data-i18n="brandSub">AI-рецепционист для салона</span></span>
+      </a>
+      <nav class="nav-links" aria-label="Навигация" data-i18n-aria="navAria">
+        <a href="#demo" data-i18n="navDemo">Живое демо</a>
+        <a href="#rules" data-i18n="navRules">Границы</a>
+        <a href="#offer" data-i18n="navOffer">Оффер</a>
+      </nav>
+      <div class="nav-actions">
+        <div class="lang-switch" role="group" aria-label="Language" data-i18n-aria="languageAria">
+          <button class="lang-button" type="button" data-lang="ru" aria-pressed="true">RU</button>
+          <button class="lang-button" type="button" data-lang="he" aria-pressed="false">עברית</button>
+        </div>
+        <a class="button small nav-cta" href="#demo" data-action="start-booking" data-i18n="navCta">Запустить</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <p class="eyebrow" data-i18n="heroEyebrow">ИЗРАИЛЬ · САЛОНЫ · RU / HE</p>
+          <h1 data-i18n-html="heroTitle">От первого сообщения <em>до понятной заявки.</em></h1>
+          <p class="hero-lead" data-i18n="heroLead">AI-рецепционист уточняет услугу и удобное время, создаёт карточку лида и зовёт владельца там, где нужен человек.</p>
+          <div class="hero-actions">
+            <a class="button accent" href="#demo" data-action="start-booking"><span data-i18n="heroPrimary">Пройти сценарий записи</span><span class="arrow" aria-hidden="true">→</span></a>
+            <a class="button secondary" href="#offer" data-i18n="heroSecondary">Показать черновик оффера</a>
+          </div>
+          <ul class="truth-line">
+            <li data-i18n="truth1">клиент видит, что отвечает AI</li>
+            <li data-i18n="truth2">время подтверждает владелец</li>
+            <li data-i18n="truth3">человек доступен по запросу</li>
+          </ul>
+        </div>
+
+        <aside class="pitch-card" aria-labelledby="pitchTitle">
+          <div class="pitch-head">
+            <div>
+              <div class="pitch-label" data-i18n="pitchLabel">НАСТРОЙКА ПОКАЗА</div>
+              <h2 class="pitch-title" id="pitchTitle" data-i18n="pitchTitle">Сделайте демо адресным за 15 секунд</h2>
+            </div>
+            <span class="local-chip">LOCAL</span>
+          </div>
+          <form class="pitch-form" id="pitchForm">
+            <div class="field">
+              <label for="businessName" data-i18n="businessLabel">Название бизнеса</label>
+              <input id="businessName" name="business" value="NOGA Studio" maxlength="48" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="cityName" data-i18n="cityLabel">Город</label>
+              <input id="cityName" name="city" value="Tel Aviv" maxlength="40" autocomplete="off">
+            </div>
+            <div class="field full">
+              <div class="pitch-foot">
+                <span class="local-note" data-i18n="pitchLocalNote">Данные меняются только в этой вкладке и никуда не отправляются.</span>
+                <button class="button small" type="submit" data-i18n="applyPitch">Обновить демо</button>
+              </div>
+            </div>
+          </form>
+        </aside>
+      </div>
+    </section>
+
+    <section class="path-strip" aria-label="Путь лида" data-i18n-aria="pathAria">
+      <div class="wrap path-grid">
+        <div class="path-intro">
+          <span class="path-kicker" data-i18n="pathKicker">ЛОГИКА ПИЛОТА</span>
+          <strong data-i18n="pathTitle">Один диалог — четыре ясных шага</strong>
+        </div>
+        <div class="path-step"><span class="path-no">01</span><strong data-i18n="path1Title">Сообщение</strong><span data-i18n="path1Text">WhatsApp или Telegram</span></div>
+        <div class="path-step"><span class="path-no">02</span><strong data-i18n="path2Title">Квалификация</strong><span data-i18n="path2Text">услуга, день, контекст</span></div>
+        <div class="path-step"><span class="path-no">03</span><strong data-i18n="path3Title">Следующий шаг</strong><span data-i18n="path3Text">заявка, не ложное подтверждение</span></div>
+        <div class="path-step"><span class="path-no">04</span><strong data-i18n="path4Title">Владелец</strong><span data-i18n="path4Text">контекст, статус, handoff</span></div>
+      </div>
+    </section>
+
+    <section class="section" id="demo">
+      <div class="wrap">
+        <div class="section-heading">
+          <div><span class="section-number">01 / LIVE WALKTHROUGH</span></div>
+          <div>
+            <h2 data-i18n="demoTitle">Пройдите путь клиента. Затем примите лид как владелец.</h2>
+            <p data-i18n="demoIntro">Два детерминированных сценария, чтобы показ всегда работал: обычная заявка и явная передача человеку. Все записи ниже — демонстрационные.</p>
+          </div>
+        </div>
+
+        <div class="demo-toolbar">
+          <div class="scenario-switch" role="group" aria-label="Сценарий" data-i18n-aria="scenarioAria">
+            <button class="scenario-button" type="button" data-scenario="booking" aria-pressed="true"><span data-i18n="scenarioBooking">WhatsApp · запись</span></button>
+            <button class="scenario-button" type="button" data-scenario="handoff" aria-pressed="false"><span data-i18n="scenarioHandoff">Telegram · нужен владелец</span></button>
+          </div>
+          <div class="scenario-meta">
+            <span data-i18n="demoDataChip">ДЕМО-ДАННЫЕ</span>
+            <button class="reset-button" id="resetDemo" type="button" data-i18n="resetDemo">Сбросить всё</button>
+          </div>
+        </div>
+
+        <div class="workspace">
+          <section class="client-side" aria-label="Клиентский чат" data-i18n-aria="clientChatAria">
+            <div class="panel-top">
+              <div class="channel-identity">
+                <div class="channel-mark" id="channelMark">WA</div>
+                <div>
+                  <div class="channel-title"><span data-business>NOGA Studio</span> · <span id="channelName">WhatsApp</span></div>
+                  <div class="channel-sub" data-i18n="clientChatSub">Ответ обычно приходит в этом чате</div>
+                </div>
+              </div>
+              <span class="sim-chip" data-i18n="simulated">СИМУЛЯЦИЯ</span>
+            </div>
+
+            <div class="chat-log" id="chatLog" aria-live="polite" aria-label="Сообщения" data-i18n-aria="messagesAria"></div>
+            <div class="quick-replies" id="quickReplies" aria-label="Быстрые ответы" data-i18n-aria="quickRepliesAria"></div>
+            <form class="composer" id="chatForm">
+              <label class="sr-only" for="chatInput" data-i18n="messageLabel">Сообщение</label>
+              <input id="chatInput" name="message" autocomplete="off" data-i18n-placeholder="messagePlaceholder" placeholder="Напишите сообщение или выберите ответ выше">
+              <button class="send-button" type="submit" aria-label="Отправить" data-i18n-aria="sendAria">→</button>
+            </form>
+          </section>
+
+          <section class="owner-side" aria-label="Owner desk" data-i18n-aria="ownerDeskAria">
+            <div class="panel-top">
+              <div class="owner-brand"><span class="owner-wordmark">KAV / OWNER DESK</span></div>
+              <div class="owner-status"><span class="status-dot"></span><span data-i18n="localSession">локальная сессия</span></div>
+            </div>
+            <div class="owner-tabs" role="tablist" aria-label="Owner views" data-i18n-aria="ownerViewsAria">
+              <button class="owner-tab" type="button" role="tab" data-owner-view="inbox" aria-selected="true" data-i18n="ownerInbox">Входящие</button>
+              <button class="owner-tab" type="button" role="tab" data-owner-view="leads" aria-selected="false" data-i18n="ownerLeads">Лиды</button>
+              <button class="owner-tab" type="button" role="tab" data-owner-view="summary" aria-selected="false" data-i18n="ownerSummary">Сводка дня</button>
+            </div>
+            <div class="owner-view" id="ownerView" role="tabpanel" aria-live="polite"></div>
+          </section>
+        </div>
+
+        <div class="handoff-note">
+          <div class="handoff-symbol" aria-hidden="true">↳</div>
+          <div>
+            <strong data-i18n="handoffNoteTitle">Human handoff — это состояние продукта, а не обещание «магии».</strong>
+            <p data-i18n="handoffNoteText">В прототипе владелец нажимает «Взять диалог», видит собранный контекст и продолжает общение. Реальные уведомления и маршрутизация настраиваются только после подключения официальных каналов владельца.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="rules">
+      <div class="wrap principles">
+        <div class="principles-copy">
+          <p class="eyebrow" data-i18n="rulesEyebrow">ГРАНИЦЫ ПРОДУКТА</p>
+          <h2 data-i18n="rulesTitle">Автоматизация снимает рутину. Решение остаётся у бизнеса.</h2>
+          <p data-i18n="rulesIntro">Для салона рецепционист собирает только операционный контекст. Он не обещает свободное окно, не оценивает сложность услуги и не выдаёт медицинских советов.</p>
+        </div>
+        <div class="rule-list">
+          <article class="rule"><div class="rule-no">01</div><div><strong data-i18n="rule1Title">Прозрачное представление</strong><p data-i18n="rule1Text">В первом сообщении сказано, что отвечает цифровой AI-помощник.</p></div></article>
+          <article class="rule"><div class="rule-no">02</div><div><strong data-i18n="rule2Title">Заявка ≠ подтверждённая запись</strong><p data-i18n="rule2Text">Время помечается как желаемое до ответа владельца или подключённого календаря.</p></div></article>
+          <article class="rule"><div class="rule-no">03</div><div><strong data-i18n="rule3Title">Минимум данных</strong><p data-i18n="rule3Text">Прототип использует ID демо-лидов и не запрашивает реальные телефоны, аккаунты или документы.</p></div></article>
+          <article class="rule"><div class="rule-no">04</div><div><strong data-i18n="rule4Title">Сомнение уходит человеку</strong><p data-i18n="rule4Text">Сложная услуга, просьба владельца или нестандартный вопрос создают явную задачу handoff.</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section offer-section" id="offer">
+      <div class="wrap offer-grid">
+        <div>
+          <p class="eyebrow" data-i18n="offerEyebrow">ЧЕРНОВИК АДРЕСНОГО ПРЕДЛОЖЕНИЯ</p>
+          <p class="offer-for"><span data-i18n="offerFor">Для</span> <strong data-business>NOGA Studio</strong> · <span data-city>Tel Aviv</span></p>
+          <h2 data-i18n="offerTitle">Пилот AI-рецепциониста на одном понятном процессе.</h2>
+          <p class="offer-copy" data-i18n="offerCopy">Собираем утверждённый RU/HE-сценарий, подключаем выбранный владельцем канал, формируем лиды и уведомления, затем проходим приёмочные диалоги вместе с командой.</p>
+          <div class="price-line">
+            <div class="price-main" dir="ltr">₪2,500–5,000</div>
+            <div class="price-caption" data-i18n="pilotPriceCaption">пилот · точная цена после карты процесса и доступов</div>
+            <div class="support-price"><bdi dir="ltr">₪600–2,000</bdi> <span data-i18n="supportCaption">/ месяц · поддержка по объёму и интеграциям</span></div>
+          </div>
+          <div class="offer-actions">
+            <button class="button accent" id="copyOffer" type="button" data-i18n="copyOffer">Скопировать текст оффера</button>
+            <a class="button secondary" href="#demo" data-action="start-handoff" data-i18n="showHandoff">Показать handoff</a>
+            <a class="button secondary" href="https://github.com/Arinbus/kav-ai-receptionist-demo/issues/new?template=demo-request.yml" target="_blank" rel="noopener noreferrer" data-i18n="requestDemo">Запросить демо</a>
+          </div>
+          <div class="copy-status" id="copyStatus" aria-live="polite"></div>
+        </div>
+
+        <div>
+          <div class="scope-sheet">
+            <div class="scope-head"><strong data-i18n="scopeTitle">Что входит в пилот</strong><span data-i18n="scopeTerm">ОРИЕНТИР: 7–10 РАБОЧИХ ДНЕЙ ПОСЛЕ ДОСТУПОВ</span></div>
+            <div class="scope-row"><div class="scope-check">01</div><div><strong data-i18n="scope1Title">Карта одного процесса</strong><span data-i18n="scope1Text">вопросы, исключения, тексты RU/HE, критерий передачи человеку</span></div></div>
+            <div class="scope-row"><div class="scope-check">02</div><div><strong data-i18n="scope2Title">Один официальный канал на старт</strong><span data-i18n="scope2Text">WhatsApp Business или Telegram — после предоставления владельцем доступа и согласования</span></div></div>
+            <div class="scope-row"><div class="scope-check">03</div><div><strong data-i18n="scope3Title">Карточка лида и уведомление</strong><span data-i18n="scope3Text">структурированные поля, статус, контекст handoff и таблица</span></div></div>
+            <div class="scope-row"><div class="scope-check">04</div><div><strong data-i18n="scope4Title">Приёмка и безопасный запуск</strong><span data-i18n="scope4Text">тестовые диалоги, исправление сценария, инструкция владельцу и ручной fallback</span></div></div>
+          </div>
+          <p class="offer-fineprint" data-i18n="offerFineprint">Черновик, не публичная оферта. Тарифы провайдеров, Meta/WhatsApp и иные внешние расходы не включены. Этот демонстрационный интерфейс ничего не отправляет и не доказывает готовность конкретной интеграции.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <p data-i18n="footerText">Публичный демонстрационный прототип. Не обращается к внешним API, не принимает реальные записи и не использует клиентскую статистику.</p>
+      <span class="footer-code">KAV-DEMO / v1</span>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const translations = {
+        ru: {
+          noticeLabel: "ДЕМО",
+          noticeText: "Локальная симуляция: реальные WhatsApp, Telegram, календарь и аккаунты не подключены.",
+          brandSub: "AI-рецепционист для салона",
+          navDemo: "Живое демо",
+          navRules: "Границы",
+          navOffer: "Оффер",
+          navCta: "Запустить",
+          navAria: "Основная навигация",
+          languageAria: "Выбор языка",
+          pathAria: "Путь лида",
+          scenarioAria: "Выбор сценария",
+          clientChatAria: "Демонстрационный клиентский чат",
+          messagesAria: "Сообщения",
+          quickRepliesAria: "Быстрые ответы",
+          ownerDeskAria: "Рабочий стол владельца",
+          ownerViewsAria: "Разделы рабочего стола владельца",
+          heroEyebrow: "ИЗРАИЛЬ · САЛОНЫ · RU / HE",
+          heroTitle: "От первого сообщения <em>до понятной заявки.</em>",
+          heroLead: "AI-рецепционист уточняет услугу и удобное время, создаёт карточку лида и зовёт владельца там, где нужен человек.",
+          heroPrimary: "Пройти сценарий записи",
+          heroSecondary: "Показать черновик оффера",
+          truth1: "клиент видит, что отвечает AI",
+          truth2: "время подтверждает владелец",
+          truth3: "человек доступен по запросу",
+          pitchLabel: "НАСТРОЙКА ПОКАЗА",
+          pitchTitle: "Сделайте демо адресным за 15 секунд",
+          businessLabel: "Название бизнеса",
+          cityLabel: "Город",
+          pitchLocalNote: "Данные меняются только в этой вкладке и никуда не отправляются.",
+          applyPitch: "Обновить демо",
+          pathKicker: "ЛОГИКА ПИЛОТА",
+          pathTitle: "Один диалог — четыре ясных шага",
+          path1Title: "Сообщение",
+          path1Text: "WhatsApp или Telegram",
+          path2Title: "Квалификация",
+          path2Text: "услуга, день, контекст",
+          path3Title: "Следующий шаг",
+          path3Text: "заявка, не ложное подтверждение",
+          path4Title: "Владелец",
+          path4Text: "контекст, статус, handoff",
+          demoTitle: "Пройдите путь клиента. Затем примите лид как владелец.",
+          demoIntro: "Два детерминированных сценария, чтобы показ всегда работал: обычная заявка и явная передача человеку. Все записи ниже — демонстрационные.",
+          scenarioBooking: "WhatsApp · запись",
+          scenarioHandoff: "Telegram · нужен владелец",
+          demoDataChip: "ДЕМО-ДАННЫЕ",
+          resetDemo: "Сбросить всё",
+          clientChatSub: "Ответ обычно приходит в этом чате",
+          simulated: "СИМУЛЯЦИЯ",
+          messageLabel: "Сообщение",
+          messagePlaceholder: "Напишите сообщение или выберите ответ выше",
+          sendAria: "Отправить",
+          localSession: "локальная сессия",
+          ownerInbox: "Входящие",
+          ownerLeads: "Лиды",
+          ownerSummary: "Сводка дня",
+          handoffNoteTitle: "Human handoff — это состояние продукта, а не обещание «магии».",
+          handoffNoteText: "В прототипе владелец нажимает «Взять диалог», видит собранный контекст и продолжает общение. Реальные уведомления и маршрутизация настраиваются только после подключения официальных каналов владельца.",
+          rulesEyebrow: "ГРАНИЦЫ ПРОДУКТА",
+          rulesTitle: "Автоматизация снимает рутину. Решение остаётся у бизнеса.",
+          rulesIntro: "Для салона рецепционист собирает только операционный контекст. Он не обещает свободное окно, не оценивает сложность услуги и не выдаёт медицинских советов.",
+          rule1Title: "Прозрачное представление",
+          rule1Text: "В первом сообщении сказано, что отвечает цифровой AI-помощник.",
+          rule2Title: "Заявка ≠ подтверждённая запись",
+          rule2Text: "Время помечается как желаемое до ответа владельца или подключённого календаря.",
+          rule3Title: "Минимум данных",
+          rule3Text: "Прототип использует ID демо-лидов и не запрашивает реальные телефоны, аккаунты или документы.",
+          rule4Title: "Сомнение уходит человеку",
+          rule4Text: "Сложная услуга, просьба владельца или нестандартный вопрос создают явную задачу handoff.",
+          offerEyebrow: "ЧЕРНОВИК АДРЕСНОГО ПРЕДЛОЖЕНИЯ",
+          offerFor: "Для",
+          offerTitle: "Пилот AI-рецепциониста на одном понятном процессе.",
+          offerCopy: "Собираем утверждённый RU/HE-сценарий, подключаем выбранный владельцем канал, формируем лиды и уведомления, затем проходим приёмочные диалоги вместе с командой.",
+          pilotPriceCaption: "пилот · точная цена после карты процесса и доступов",
+          supportCaption: "/ месяц · поддержка по объёму и интеграциям",
+          copyOffer: "Скопировать текст оффера",
+          showHandoff: "Показать handoff",
+          requestDemo: "Запросить демо",
+          scopeTitle: "Что входит в пилот",
+          scopeTerm: "ОРИЕНТИР: 7–10 РАБОЧИХ ДНЕЙ ПОСЛЕ ДОСТУПОВ",
+          scope1Title: "Карта одного процесса",
+          scope1Text: "вопросы, исключения, тексты RU/HE, критерий передачи человеку",
+          scope2Title: "Один официальный канал на старт",
+          scope2Text: "WhatsApp Business или Telegram — после предоставления владельцем доступа и согласования",
+          scope3Title: "Карточка лида и уведомление",
+          scope3Text: "структурированные поля, статус, контекст handoff и таблица",
+          scope4Title: "Приёмка и безопасный запуск",
+          scope4Text: "тестовые диалоги, исправление сценария, инструкция владельцу и ручной fallback",
+          offerFineprint: "Черновик, не публичная оферта. Тарифы провайдеров, Meta/WhatsApp и иные внешние расходы не включены. Этот демонстрационный интерфейс ничего не отправляет и не доказывает готовность конкретной интеграции.",
+          footerText: "Публичный демонстрационный прототип. Не обращается к внешним API, не принимает реальные записи и не использует клиентскую статистику.",
+          aiSpeaker: "AI-РЕЦЕПЦИОНИСТ",
+          clientSpeaker: "КЛИЕНТ · ДЕМО",
+          systemSpeaker: "HANDOFF",
+          openDialogs: "Открытые демо-диалоги",
+          activeLead: "Активный лид",
+          fieldChannel: "Канал / язык",
+          fieldService: "Запрос",
+          fieldTime: "Желаемое время",
+          fieldStatus: "Статус",
+          takeConversation: "Взять диалог",
+          markContact: "Отметить: свяжусь",
+          ownerConnected: "Владелец подключён",
+          copyLead: "Скопировать карточку",
+          leadsTitle: "Таблица демо-лидов",
+          exportCsv: "Экспорт CSV",
+          colLead: "Лид",
+          colChannel: "Канал",
+          colRequest: "Запрос",
+          colTime: "Время",
+          colStatus: "Статус",
+          summaryTitle: "Сводка дня",
+          summaryLabel: "СГЕНЕРИРОВАНО ИЗ ДЕМО-ЗАПИСЕЙ",
+          summaryOpen: "диалогов в сессии",
+          summaryReady: "готовы владельцу",
+          summaryHandoff: "явный handoff",
+          metricsDisclaimer: "Это счётчики текущей демонстрации, а не реальные показатели клиента.",
+          summaryCopy: "Скопировать сводку",
+          statusQualifying: "Квалификация",
+          statusNew: "Новая заявка",
+          statusHandoff: "Нужен владелец",
+          statusOwner: "Владелец в диалоге",
+          serviceHaircut: "Женская стрижка",
+          serviceColor: "Сложное окрашивание",
+          requestCollecting: "Уточняется",
+          requestTomorrow1830: "Завтра · 18:30",
+          requestTomorrow1915: "Завтра · 19:15",
+          requestFriday0930: "Пятница · 09:30",
+          requestFriday1100: "Пятница · 11:00",
+          requestToday1800: "Ответ сегодня после 18:00",
+          requestTomorrowMorning: "Ответ завтра утром",
+          detailShoulder: "длина до плеч",
+          detailLong: "длинные волосы",
+          updatedNow: "только что",
+          demoApplied: "Показ обновлён локально",
+          demoReset: "Демо возвращено в исходное состояние",
+          switchedLanguage: "Сценарий перезапущен на русском",
+          leadCopied: "Карточка лида скопирована",
+          summaryCopied: "Сводка скопирована",
+          offerCopied: "Черновик оффера скопирован",
+          copyFailed: "Не удалось скопировать автоматически",
+          csvReady: "CSV с демо-лидами подготовлен",
+          customCaptured: "Сообщение сохранено в локальном демо. Для гарантированного маршрута выберите один из ответов выше.",
+          customHandoff: "Поняла. Создаю задачу владельцу и передаю контекст. Он продолжит в этом чате.",
+          ownerJoinMessage: "Владелец подключился к демонстрационному диалогу и видит собранный контекст.",
+          ownerActionDone: "Статус обновлён: владелец подключён",
+          emptyMessage: "Введите сообщение",
+          summaryTemplate: "Сводка демо-сессии для {business}:\n• Открыто диалогов: {open}.\n• Готовых заявок для проверки: {ready}.\n• Запросов на владельца: {handoff}.\n{priority}",
+          priorityNone: "Сейчас нет новых задач владельцу.",
+          prioritySome: "Требуют действия: {ids}.",
+          offerTemplate: "Черновик предложения для {business}, {city}\n\nПилот AI-рецепциониста RU/HE на одном процессе: квалификация обращения, заявка/запись, передача владельцу, таблица лидов и дневная сводка.\n\nПилот: ₪2,500–5,000.\nПоддержка: ₪600–2,000/месяц.\nОриентир: 7–10 рабочих дней после согласования процесса и получения доступов.\n\nТочная стоимость зависит от канала, объёма и интеграций. Внешние тарифы не включены. Реальные аккаунты подключаются только владельцем и после согласования прав доступа.",
+          leadCardTemplate: "Демо-лид {id}\nКанал: {channel} · {language}\nЗапрос: {service}\nЖелаемое время: {request}\nСтатус: {status}",
+          summaryPriorityLabel: "Приоритет"
+        },
+        he: {
+          noticeLabel: "דמו",
+          noticeText: "סימולציה מקומית: WhatsApp, Telegram, יומן וחשבונות אמיתיים אינם מחוברים.",
+          brandSub: "פקידת קבלה חכמה לסלון",
+          navDemo: "דמו חי",
+          navRules: "גבולות",
+          navOffer: "הצעה",
+          navCta: "הפעלה",
+          navAria: "ניווט ראשי",
+          languageAria: "בחירת שפה",
+          pathAria: "מסלול הליד",
+          scenarioAria: "בחירת תרחיש",
+          clientChatAria: "צ'אט לקוח לדוגמה",
+          messagesAria: "הודעות",
+          quickRepliesAria: "תשובות מהירות",
+          ownerDeskAria: "מסך בעלת העסק",
+          ownerViewsAria: "חלקי מסך בעלת העסק",
+          heroEyebrow: "ישראל · סלונים · עברית / רוסית",
+          heroTitle: "מההודעה הראשונה <em>לבקשה מסודרת.</em>",
+          heroLead: "פקידת קבלה מבוססת AI מבררת את השירות והזמן הרצוי, יוצרת כרטיס ליד ומזמינה את בעלת העסק כשצריך אדם.",
+          heroPrimary: "לעבור תרחיש קביעת תור",
+          heroSecondary: "לראות טיוטת הצעה",
+          truth1: "הלקוח יודע שמדובר ב-AI",
+          truth2: "בעלת העסק מאשרת את השעה",
+          truth3: "אפשר לבקש אדם בכל שלב",
+          pitchLabel: "התאמת ההדגמה",
+          pitchTitle: "הפכו את הדמו לאישי תוך 15 שניות",
+          businessLabel: "שם העסק",
+          cityLabel: "עיר",
+          pitchLocalNote: "המידע משתנה רק בכרטיסייה הזו ואינו נשלח לשום מקום.",
+          applyPitch: "עדכון הדמו",
+          pathKicker: "לוגיקת הפיילוט",
+          pathTitle: "שיחה אחת — ארבעה צעדים ברורים",
+          path1Title: "הודעה",
+          path1Text: "WhatsApp או Telegram",
+          path2Title: "בירור",
+          path2Text: "שירות, יום והקשר",
+          path3Title: "הצעד הבא",
+          path3Text: "בקשה, לא אישור שווא",
+          path4Title: "בעלת העסק",
+          path4Text: "הקשר, סטטוס והעברה",
+          demoTitle: "עברו את מסלול הלקוח. אחר כך קבלו את הליד כבעלת העסק.",
+          demoIntro: "שני תרחישים קבועים כדי שההדגמה תמיד תעבוד: בקשת תור רגילה והעברה מפורשת לאדם. כל הרשומות הן נתוני דמו.",
+          scenarioBooking: "WhatsApp · קביעת תור",
+          scenarioHandoff: "Telegram · צריך בעלת עסק",
+          demoDataChip: "נתוני דמו",
+          resetDemo: "איפוס הכול",
+          clientChatSub: "התשובה בדרך כלל מגיעה בצ'אט הזה",
+          simulated: "סימולציה",
+          messageLabel: "הודעה",
+          messagePlaceholder: "כתבו הודעה או בחרו תשובה למעלה",
+          sendAria: "שליחה",
+          localSession: "סשן מקומי",
+          ownerInbox: "נכנסות",
+          ownerLeads: "לידים",
+          ownerSummary: "סיכום יומי",
+          handoffNoteTitle: "העברה לאדם היא מצב מוצר — לא הבטחת קסם.",
+          handoffNoteText: "באב-טיפוס בעלת העסק לוחצת \"לקחת שיחה\", רואה את ההקשר שנאסף וממשיכה את השיחה. התראות וניתוב אמיתיים מוגדרים רק לאחר חיבור הערוצים הרשמיים של העסק.",
+          rulesEyebrow: "גבולות המוצר",
+          rulesTitle: "האוטומציה מורידה שגרה. ההחלטה נשארת בעסק.",
+          rulesIntro: "לסלון, פקידת הקבלה אוספת רק הקשר תפעולי. היא לא מבטיחה מקום פנוי, לא מעריכה את מורכבות השירות ולא נותנת ייעוץ רפואי.",
+          rule1Title: "הצגה שקופה",
+          rule1Text: "בהודעה הראשונה נאמר שהמענה ניתן על ידי עוזרת AI דיגיטלית.",
+          rule2Title: "בקשה אינה תור מאושר",
+          rule2Text: "השעה מסומנת כרצויה עד לאישור בעלת העסק או יומן מחובר.",
+          rule3Title: "מינימום מידע",
+          rule3Text: "הדמו משתמש במזהי לידים לדוגמה ואינו מבקש מספרי טלפון, חשבונות או מסמכים אמיתיים.",
+          rule4Title: "ספק עובר לאדם",
+          rule4Text: "שירות מורכב, בקשה לבעלת העסק או שאלה חריגה יוצרים משימת העברה ברורה.",
+          offerEyebrow: "טיוטת הצעה אישית לעסק",
+          offerFor: "עבור",
+          offerTitle: "פיילוט של פקידת קבלה חכמה בתהליך אחד וברור.",
+          offerCopy: "בונים תרחיש מאושר בעברית וברוסית, מחברים ערוץ שנבחר על ידי בעלת העסק, יוצרים לידים והתראות, ואז מבצעים שיחות קבלה יחד עם הצוות.",
+          pilotPriceCaption: "פיילוט · מחיר מדויק לאחר מיפוי תהליך וקבלת גישות",
+          supportCaption: "/ חודש · תמיכה לפי נפח ואינטגרציות",
+          copyOffer: "העתקת טקסט ההצעה",
+          showHandoff: "להציג העברה לאדם",
+          requestDemo: "בקשת הדגמה",
+          scopeTitle: "מה כלול בפיילוט",
+          scopeTerm: "יעד: 7–10 ימי עבודה לאחר קבלת גישות",
+          scope1Title: "מיפוי של תהליך אחד",
+          scope1Text: "שאלות, חריגים, טקסטים בעברית וברוסית וכלל העברה לאדם",
+          scope2Title: "ערוץ רשמי אחד להתחלה",
+          scope2Text: "WhatsApp Business או Telegram — לאחר שהעסק מספק גישה ומאשר",
+          scope3Title: "כרטיס ליד והתראה",
+          scope3Text: "שדות מובנים, סטטוס, הקשר להעברה וטבלה",
+          scope4Title: "קבלה והשקה בטוחה",
+          scope4Text: "שיחות בדיקה, תיקון התרחיש, הדרכה לבעלת העסק וגיבוי ידני",
+          offerFineprint: "טיוטה בלבד, לא הצעה מחייבת. תעריפי ספקים, Meta/WhatsApp והוצאות חיצוניות אינם כלולים. ממשק ההדגמה אינו שולח דבר ואינו מוכיח שאינטגרציה מסוימת מוכנה.",
+          footerText: "אב-טיפוס ציבורי להדגמה. אינו פונה ל-API חיצוני, אינו מקבל תורים אמיתיים ואינו משתמש בנתוני לקוחות.",
+          aiSpeaker: "פקידת קבלה AI",
+          clientSpeaker: "לקוח · דמו",
+          systemSpeaker: "העברה לאדם",
+          openDialogs: "שיחות דמו פתוחות",
+          activeLead: "ליד פעיל",
+          fieldChannel: "ערוץ / שפה",
+          fieldService: "בקשה",
+          fieldTime: "זמן רצוי",
+          fieldStatus: "סטטוס",
+          takeConversation: "לקחת שיחה",
+          markContact: "לסמן: אחזור ללקוח",
+          ownerConnected: "בעלת העסק הצטרפה",
+          copyLead: "העתקת כרטיס",
+          leadsTitle: "טבלת לידים לדוגמה",
+          exportCsv: "ייצוא CSV",
+          colLead: "ליד",
+          colChannel: "ערוץ",
+          colRequest: "בקשה",
+          colTime: "זמן",
+          colStatus: "סטטוס",
+          summaryTitle: "סיכום יומי",
+          summaryLabel: "נוצר מרשומות הדמו",
+          summaryOpen: "שיחות בסשן",
+          summaryReady: "מוכנים לבעלת העסק",
+          summaryHandoff: "העברות מפורשות",
+          metricsDisclaimer: "אלה מוני ההדגמה הנוכחית, לא נתונים אמיתיים של לקוח.",
+          summaryCopy: "העתקת הסיכום",
+          statusQualifying: "בירור פרטים",
+          statusNew: "בקשה חדשה",
+          statusHandoff: "נדרשת בעלת העסק",
+          statusOwner: "בעלת העסק בשיחה",
+          serviceHaircut: "תספורת נשים",
+          serviceColor: "צביעה מורכבת",
+          requestCollecting: "בבירור",
+          requestTomorrow1830: "מחר · 18:30",
+          requestTomorrow1915: "מחר · 19:15",
+          requestFriday0930: "יום שישי · 09:30",
+          requestFriday1100: "יום שישי · 11:00",
+          requestToday1800: "מענה היום אחרי 18:00",
+          requestTomorrowMorning: "מענה מחר בבוקר",
+          detailShoulder: "שיער עד הכתפיים",
+          detailLong: "שיער ארוך",
+          updatedNow: "עכשיו",
+          demoApplied: "ההדגמה עודכנה מקומית",
+          demoReset: "הדמו חזר למצב ההתחלתי",
+          switchedLanguage: "התרחיש הופעל מחדש בעברית",
+          leadCopied: "כרטיס הליד הועתק",
+          summaryCopied: "הסיכום הועתק",
+          offerCopied: "טיוטת ההצעה הועתקה",
+          copyFailed: "לא ניתן היה להעתיק אוטומטית",
+          csvReady: "קובץ CSV עם נתוני דמו הוכן",
+          customCaptured: "ההודעה נשמרה בדמו המקומי. למסלול מובטח, בחרו אחת מהתשובות למעלה.",
+          customHandoff: "הבנתי. אני יוצרת משימה לבעלת העסק ומעבירה את ההקשר. היא תמשיך בצ'אט הזה.",
+          ownerJoinMessage: "בעלת העסק הצטרפה לשיחת הדמו ורואה את ההקשר שנאסף.",
+          ownerActionDone: "הסטטוס עודכן: בעלת העסק הצטרפה",
+          emptyMessage: "נא לכתוב הודעה",
+          summaryTemplate: "סיכום סשן הדמו עבור {business}:\n• שיחות פתוחות: {open}.\n• בקשות מוכנות לבדיקה: {ready}.\n• בקשות לבעלת העסק: {handoff}.\n{priority}",
+          priorityNone: "אין כרגע משימות חדשות לבעלת העסק.",
+          prioritySome: "דורשים טיפול: {ids}.",
+          offerTemplate: "טיוטת הצעה עבור {business}, {city}\n\nפיילוט של פקידת קבלה AI בעברית וברוסית בתהליך אחד: בירור פנייה, בקשת תור, העברה לבעלת העסק, טבלת לידים וסיכום יומי.\n\nפיילוט: ₪2,500–5,000.\nתמיכה: ₪600–2,000 לחודש.\nיעד: 7–10 ימי עבודה לאחר אישור התהליך וקבלת הגישות.\n\nהמחיר המדויק תלוי בערוץ, בנפח ובאינטגרציות. תעריפים חיצוניים אינם כלולים. חשבונות אמיתיים מחוברים רק על ידי בעלת העסק ולאחר אישור הרשאות.",
+          leadCardTemplate: "ליד דמו {id}\nערוץ: {channel} · {language}\nבקשה: {service}\nזמן רצוי: {request}\nסטטוס: {status}",
+          summaryPriorityLabel: "עדיפות"
+        }
+      };
+
+      const flows = {
+        booking: {
+          channel: "WhatsApp",
+          channelCode: "WA",
+          leadId: "D-101",
+          initialStage: "timing",
+          copy: {
+            ru: {
+              initial: [
+                ["assistant", "Здравствуйте! Я цифровой AI-рецепционист {business}. Помогу оформить заявку на запись. В любой момент можно попросить владельца."],
+                ["customer", "Добрый вечер, хочу записаться на женскую стрижку."],
+                ["assistant", "Конечно. Какой день и время вам удобны?"]
+              ],
+              stages: {
+                timing: [
+                  { id: "tomorrow", label: "Завтра после 17:00", reply: "Могу отметить 18:30 или 19:15. Какой вариант записать как желаемый?", next: "tomorrowSlots" },
+                  { id: "friday", label: "В пятницу утром", reply: "Могу отметить 09:30 или 11:00. Какой вариант записать как желаемый?", next: "fridaySlots" }
+                ],
+                tomorrowSlots: [
+                  { id: "t1830", label: "18:30", reply: "Зафиксировать контакт из этого WhatsApp-чата и передать владельцу заявку на 18:30? Время ещё не подтверждено.", next: "confirm", request: "requestTomorrow1830" },
+                  { id: "t1915", label: "19:15", reply: "Зафиксировать контакт из этого WhatsApp-чата и передать владельцу заявку на 19:15? Время ещё не подтверждено.", next: "confirm", request: "requestTomorrow1915" }
+                ],
+                fridaySlots: [
+                  { id: "f0930", label: "09:30", reply: "Зафиксировать контакт из этого WhatsApp-чата и передать владельцу заявку на пятницу, 09:30? Время ещё не подтверждено.", next: "confirm", request: "requestFriday0930" },
+                  { id: "f1100", label: "11:00", reply: "Зафиксировать контакт из этого WhatsApp-чата и передать владельцу заявку на пятницу, 11:00? Время ещё не подтверждено.", next: "confirm", request: "requestFriday1100" }
+                ],
+                confirm: [
+                  { id: "create", label: "Да, создать заявку", reply: "Готово. Демо-заявка D-101 передана владельцу. Он проверит время и ответит здесь — запись пока не подтверждена.", final: "new" },
+                  { id: "human", label: "Сначала поговорить с владельцем", reply: "Поняла. Передаю владельцу собранный контекст и отмечаю, что нужен личный ответ.", final: "handoff" }
+                ]
+              }
+            },
+            he: {
+              initial: [
+                ["assistant", "שלום! אני פקידת הקבלה הדיגיטלית מבוססת AI של {business}. אעזור להכין בקשת תור. בכל שלב אפשר לבקש את בעלת העסק."],
+                ["customer", "ערב טוב, אני רוצה לקבוע תור לתספורת נשים."],
+                ["assistant", "בשמחה. איזה יום ושעה נוחים לך?"]
+              ],
+              stages: {
+                timing: [
+                  { id: "tomorrow", label: "מחר אחרי 17:00", reply: "אפשר לסמן 18:30 או 19:15. איזו שעה לרשום כשעה רצויה?", next: "tomorrowSlots" },
+                  { id: "friday", label: "יום שישי בבוקר", reply: "אפשר לסמן 09:30 או 11:00. איזו שעה לרשום כשעה רצויה?", next: "fridaySlots" }
+                ],
+                tomorrowSlots: [
+                  { id: "t1830", label: "18:30", reply: "לשמור את איש הקשר מצ'אט ה-WhatsApp הזה ולהעביר בקשה ל-18:30? השעה עדיין לא מאושרת.", next: "confirm", request: "requestTomorrow1830" },
+                  { id: "t1915", label: "19:15", reply: "לשמור את איש הקשר מצ'אט ה-WhatsApp הזה ולהעביר בקשה ל-19:15? השעה עדיין לא מאושרת.", next: "confirm", request: "requestTomorrow1915" }
+                ],
+                fridaySlots: [
+                  { id: "f0930", label: "09:30", reply: "לשמור את איש הקשר מהצ'אט ולהעביר בקשה ליום שישי ב-09:30? השעה עדיין לא מאושרת.", next: "confirm", request: "requestFriday0930" },
+                  { id: "f1100", label: "11:00", reply: "לשמור את איש הקשר מהצ'אט ולהעביר בקשה ליום שישי ב-11:00? השעה עדיין לא מאושרת.", next: "confirm", request: "requestFriday1100" }
+                ],
+                confirm: [
+                  { id: "create", label: "כן, ליצור בקשה", reply: "בוצע. בקשת הדמו D-101 הועברה לבעלת העסק. היא תבדוק את השעה ותענה כאן — התור עדיין לא מאושר.", final: "new" },
+                  { id: "human", label: "קודם לדבר עם בעלת העסק", reply: "הבנתי. אני מעבירה לבעלת העסק את ההקשר ומסמנת שנדרש מענה אישי.", final: "handoff" }
+                ]
+              }
+            }
+          }
+        },
+        handoff: {
+          channel: "Telegram",
+          channelCode: "TG",
+          leadId: "D-102",
+          initialStage: "length",
+          copy: {
+            ru: {
+              initial: [
+                ["assistant", "Здравствуйте! Я цифровой AI-рецепционист {business}. Соберу только нужные детали; в любой момент можно попросить владельца."],
+                ["customer", "Мне нужно сложное окрашивание и я хочу поговорить с владельцем студии."],
+                ["assistant", "Конечно. Чтобы передать понятную заявку: какая длина волос и когда удобно получить ответ?"]
+              ],
+              stages: {
+                length: [
+                  { id: "shoulder", label: "До плеч", reply: "Спасибо. Когда владельцу лучше ответить?", next: "replyTime", detail: "detailShoulder" },
+                  { id: "long", label: "Длинные", reply: "Спасибо. Когда владельцу лучше ответить?", next: "replyTime", detail: "detailLong" }
+                ],
+                replyTime: [
+                  { id: "today", label: "Сегодня после 18:00", reply: "Передать владельцу: сложное окрашивание, выбранная длина, ответ сегодня после 18:00? Я не буду оценивать технику или обещать результат.", next: "handoffConfirm", request: "requestToday1800" },
+                  { id: "morning", label: "Завтра утром", reply: "Передать владельцу: сложное окрашивание, выбранная длина, ответ завтра утром? Я не буду оценивать технику или обещать результат.", next: "handoffConfirm", request: "requestTomorrowMorning" }
+                ],
+                handoffConfirm: [
+                  { id: "handoff", label: "Да, передать владельцу", reply: "Готово. Демо-лид D-102 отмечен как «Нужен владелец». Он увидит контекст и продолжит здесь.", final: "handoff" }
+                ]
+              }
+            },
+            he: {
+              initial: [
+                ["assistant", "שלום! אני פקידת הקבלה הדיגיטלית מבוססת AI של {business}. אאסוף רק את הפרטים הנחוצים; בכל שלב אפשר לבקש את בעלת העסק."],
+                ["customer", "אני צריכה צביעה מורכבת ורוצה לדבר עם בעלת הסטודיו."],
+                ["assistant", "בהחלט. כדי להעביר בקשה מסודרת: מה אורך השיער ומתי נוח לקבל תשובה?"]
+              ],
+              stages: {
+                length: [
+                  { id: "shoulder", label: "עד הכתפיים", reply: "תודה. מתי עדיף שבעלת העסק תחזור אלייך?", next: "replyTime", detail: "detailShoulder" },
+                  { id: "long", label: "שיער ארוך", reply: "תודה. מתי עדיף שבעלת העסק תחזור אלייך?", next: "replyTime", detail: "detailLong" }
+                ],
+                replyTime: [
+                  { id: "today", label: "היום אחרי 18:00", reply: "להעביר לבעלת העסק: צביעה מורכבת, האורך שנבחר ומענה היום אחרי 18:00? אני לא מעריכה טכניקה ולא מבטיחה תוצאה.", next: "handoffConfirm", request: "requestToday1800" },
+                  { id: "morning", label: "מחר בבוקר", reply: "להעביר לבעלת העסק: צביעה מורכבת, האורך שנבחר ומענה מחר בבוקר? אני לא מעריכה טכניקה ולא מבטיחה תוצאה.", next: "handoffConfirm", request: "requestTomorrowMorning" }
+                ],
+                handoffConfirm: [
+                  { id: "handoff", label: "כן, להעביר לבעלת העסק", reply: "בוצע. ליד הדמו D-102 סומן כ\"נדרשת בעלת העסק\". היא תראה את ההקשר ותמשיך כאן.", final: "handoff" }
+                ]
+              }
+            }
+          }
+        }
+      };
+
+      function defaultLeads() {
+        return [
+          { id: "D-101", scenario: "booking", channel: "WhatsApp", language: "RU", serviceKey: "serviceHaircut", requestKey: "requestCollecting", detailKey: "", status: "qualifying" },
+          { id: "D-102", scenario: "handoff", channel: "Telegram", language: "HE", serviceKey: "serviceColor", requestKey: "requestCollecting", detailKey: "", status: "qualifying" }
+        ];
+      }
+
+      const state = {
+        lang: "ru",
+        scenario: "booking",
+        stage: "timing",
+        messages: [],
+        ownerView: "inbox",
+        business: "NOGA Studio",
+        city: "Tel Aviv",
+        leads: defaultLeads()
+      };
+
+      const $ = (selector, root = document) => root.querySelector(selector);
+      const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+      const tr = (key) => translations[state.lang][key] ?? key;
+      const format = (template, values) => Object.entries(values).reduce((text, [key, value]) => text.replaceAll(`{${key}}`, String(value)), template);
+      const esc = (value) => String(value).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
+      const activeFlow = () => flows[state.scenario];
+      const activeLead = () => state.leads.find(lead => lead.id === activeFlow().leadId);
+      const flowCopy = () => activeFlow().copy[state.lang];
+
+      function template(text) {
+        return format(text, { business: state.business, city: state.city });
+      }
+
+      function statusText(status) {
+        return tr({ qualifying: "statusQualifying", new: "statusNew", handoff: "statusHandoff", owner: "statusOwner" }[status]);
+      }
+
+      function statusClass(status) {
+        return status === "new" ? "" : status;
+      }
+
+      function requestText(lead) {
+        const main = tr(lead.requestKey);
+        return lead.detailKey ? `${main} · ${tr(lead.detailKey)}` : main;
+      }
+
+      function serviceText(lead) {
+        return tr(lead.serviceKey);
+      }
+
+      function announce(text) {
+        const toast = $("#toast");
+        toast.textContent = text;
+        toast.classList.add("visible");
+        clearTimeout(announce.timer);
+        announce.timer = setTimeout(() => toast.classList.remove("visible"), 2200);
+      }
+
+      function translateStatic() {
+        document.documentElement.lang = state.lang;
+        document.documentElement.dir = state.lang === "he" ? "rtl" : "ltr";
+        $$('[data-i18n]').forEach(node => { node.textContent = tr(node.dataset.i18n); });
+        $$('[data-i18n-html]').forEach(node => { node.innerHTML = tr(node.dataset.i18nHtml); });
+        $$('[data-i18n-placeholder]').forEach(node => { node.placeholder = tr(node.dataset.i18nPlaceholder); });
+        $$('[data-i18n-aria]').forEach(node => { node.setAttribute("aria-label", tr(node.dataset.i18nAria)); });
+        $$('[data-lang]').forEach(button => button.setAttribute("aria-pressed", String(button.dataset.lang === state.lang)));
+        renderBusiness();
+      }
+
+      function renderBusiness() {
+        $$('[data-business]').forEach(node => { node.textContent = state.business; });
+        $$('[data-city]').forEach(node => { node.textContent = state.city; });
+      }
+
+      function resetConversation() {
+        state.stage = activeFlow().initialStage;
+        state.messages = flowCopy().initial.map(([role, text]) => ({ role, text: template(text) }));
+        renderChat();
+      }
+
+      function activateScenario(scenario, options = {}) {
+        state.scenario = scenario;
+        const flow = activeFlow();
+        if (options.resetLead) {
+          const lead = activeLead();
+          Object.assign(lead, {
+            requestKey: "requestCollecting",
+            detailKey: "",
+            status: "qualifying"
+          });
+        }
+        $$('.scenario-button').forEach(button => button.setAttribute("aria-pressed", String(button.dataset.scenario === scenario)));
+        const mark = $("#channelMark");
+        mark.textContent = flow.channelCode;
+        mark.classList.toggle("telegram", flow.channel === "Telegram");
+        $("#channelName").textContent = flow.channel;
+        resetConversation();
+        renderOwner();
+        if (options.scroll) $("#demo").scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      function renderChat() {
+        const log = $("#chatLog");
+        log.innerHTML = "";
+        state.messages.forEach(message => {
+          const wrapper = document.createElement("div");
+          wrapper.className = `message ${message.role}`;
+          const speakerKey = message.role === "assistant" ? "aiSpeaker" : message.role === "customer" ? "clientSpeaker" : "systemSpeaker";
+          wrapper.innerHTML = `<span class="speaker">${esc(tr(speakerKey))}</span><div class="bubble">${esc(message.text)}</div>`;
+          log.appendChild(wrapper);
+        });
+        renderQuickReplies();
+        requestAnimationFrame(() => { log.scrollTop = log.scrollHeight; });
+      }
+
+      function renderQuickReplies() {
+        const container = $("#quickReplies");
+        container.innerHTML = "";
+        if (!state.stage) return;
+        const options = flowCopy().stages[state.stage] || [];
+        options.forEach(option => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "quick-button";
+          button.dataset.choice = option.id;
+          button.textContent = option.label;
+          button.addEventListener("click", () => chooseOption(option.id));
+          container.appendChild(button);
+        });
+      }
+
+      function chooseOption(optionId) {
+        if (!state.stage) return;
+        const options = flowCopy().stages[state.stage] || [];
+        const option = options.find(item => item.id === optionId);
+        if (!option) return;
+        const lead = activeLead();
+        state.messages.push({ role: "customer", text: option.label });
+        state.messages.push({ role: "assistant", text: template(option.reply) });
+        if (option.request) lead.requestKey = option.request;
+        if (option.detail) lead.detailKey = option.detail;
+        if (option.final) {
+          lead.status = option.final;
+          state.stage = null;
+          state.ownerView = "inbox";
+          state.messages.push({
+            role: "system",
+            text: option.final === "handoff"
+              ? (state.lang === "ru" ? "Владелец получил явную задачу и контекст диалога." : "בעלת העסק קיבלה משימה מפורשת ואת הקשר השיחה.")
+              : (state.lang === "ru" ? "В Owner Desk появилась новая заявка на проверку времени." : "בקשה חדשה לבדיקת שעה הופיעה במסך בעלת העסק.")
+          });
+        } else {
+          state.stage = option.next;
+        }
+        renderChat();
+        renderOwner();
+      }
+
+      function renderOwner() {
+        $$('.owner-tab').forEach(tab => tab.setAttribute("aria-selected", String(tab.dataset.ownerView === state.ownerView)));
+        if (state.ownerView === "inbox") renderInbox();
+        if (state.ownerView === "leads") renderLeadsTable();
+        if (state.ownerView === "summary") renderSummary();
+      }
+
+      function renderQueueItem(lead) {
+        const active = lead.id === activeLead().id;
+        const channelClass = lead.channel === "Telegram" ? "telegram" : "";
+        return `
+          <button class="queue-item ${active ? "active" : ""}" type="button" data-open-lead="${esc(lead.id)}">
+            <span class="channel-mini ${channelClass}">${lead.channel === "Telegram" ? "TG" : "WA"}</span>
+            <span class="queue-copy"><strong>${esc(serviceText(lead))}</strong><span>${esc(statusText(lead.status))}</span></span>
+            <span class="queue-id">${esc(lead.id)}</span>
+          </button>`;
+      }
+
+      function renderInbox() {
+        const lead = activeLead();
+        const primaryKey = lead.status === "owner" ? "ownerConnected" : lead.status === "handoff" ? "takeConversation" : "markContact";
+        const ownerView = $("#ownerView");
+        ownerView.innerHTML = `
+          <p class="inbox-label">${esc(tr("openDialogs"))} · ${state.leads.length}</p>
+          <div class="queue">${state.leads.map(renderQueueItem).join("")}</div>
+          <p class="inbox-label">${esc(tr("activeLead"))}</p>
+          <article class="lead-card">
+            <div class="lead-card-head">
+              <div><span class="lead-id">${esc(lead.id)} · ${esc(tr("updatedNow"))}</span><h3>${esc(serviceText(lead))}</h3></div>
+              <span class="status-pill ${statusClass(lead.status)}">${esc(statusText(lead.status))}</span>
+            </div>
+            <div class="lead-fields">
+              <div class="lead-field"><span>${esc(tr("fieldChannel"))}</span><strong>${esc(lead.channel)} · ${esc(lead.language)}</strong></div>
+              <div class="lead-field"><span>${esc(tr("fieldService"))}</span><strong>${esc(serviceText(lead))}</strong></div>
+              <div class="lead-field"><span>${esc(tr("fieldTime"))}</span><strong>${esc(requestText(lead))}</strong></div>
+              <div class="lead-field"><span>${esc(tr("fieldStatus"))}</span><strong>${esc(statusText(lead.status))}</strong></div>
+            </div>
+            <div class="lead-actions">
+              <button class="button small" id="ownerPrimaryAction" type="button" ${lead.status === "owner" ? "disabled" : ""}>${esc(tr(primaryKey))}</button>
+              <button class="button secondary small" id="copyLead" type="button">${esc(tr("copyLead"))}</button>
+            </div>
+          </article>`;
+        $$('[data-open-lead]', ownerView).forEach(button => button.addEventListener("click", () => {
+          const selected = state.leads.find(item => item.id === button.dataset.openLead);
+          if (selected) activateScenario(selected.scenario);
+        }));
+        $("#ownerPrimaryAction")?.addEventListener("click", takeConversation);
+        $("#copyLead")?.addEventListener("click", () => copyLead(lead));
+      }
+
+      function renderLeadsTable() {
+        const rows = state.leads.map(lead => `
+          <tr>
+            <td><strong>${esc(lead.id)}</strong><span>${esc(tr("updatedNow"))}</span></td>
+            <td><strong>${esc(lead.channel)}</strong><span>${esc(lead.language)}</span></td>
+            <td><strong>${esc(serviceText(lead))}</strong><span>${esc(lead.detailKey ? tr(lead.detailKey) : "—")}</span></td>
+            <td>${esc(requestText(lead))}</td>
+            <td><span class="status-pill ${statusClass(lead.status)}">${esc(statusText(lead.status))}</span></td>
+          </tr>`).join("");
+        $("#ownerView").innerHTML = `
+          <div class="table-toolbar">
+            <div><h3>${esc(tr("leadsTitle"))}</h3><span class="demo-data-label">${esc(tr("demoDataChip"))}</span></div>
+            <button class="button secondary small" id="exportCsv" type="button">${esc(tr("exportCsv"))}</button>
+          </div>
+          <div class="table-scroll"><table>
+            <thead><tr><th>${esc(tr("colLead"))}</th><th>${esc(tr("colChannel"))}</th><th>${esc(tr("colRequest"))}</th><th>${esc(tr("colTime"))}</th><th>${esc(tr("colStatus"))}</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table></div>`;
+        $("#exportCsv").addEventListener("click", exportCsv);
+      }
+
+      function summaryData() {
+        const actionable = state.leads.filter(lead => lead.status === "new" || lead.status === "handoff");
+        return {
+          open: state.leads.length,
+          ready: actionable.length,
+          handoff: state.leads.filter(lead => lead.status === "handoff").length,
+          ids: actionable.map(lead => lead.id)
+        };
+      }
+
+      function summaryText() {
+        const data = summaryData();
+        const priority = data.ids.length
+          ? format(tr("prioritySome"), { ids: data.ids.join(", ") })
+          : tr("priorityNone");
+        return format(tr("summaryTemplate"), { business: state.business, open: data.open, ready: data.ready, handoff: data.handoff, priority });
+      }
+
+      function renderSummary() {
+        const data = summaryData();
+        $("#ownerView").innerHTML = `
+          <div class="summary-panel">
+            <div><h3>${esc(tr("summaryTitle"))}</h3><span class="demo-data-label">${esc(tr("demoDataChip"))}</span></div>
+            <div class="summary-counts">
+              <div class="summary-count"><strong>${data.open}</strong><span>${esc(tr("summaryOpen"))}</span></div>
+              <div class="summary-count"><strong>${data.ready}</strong><span>${esc(tr("summaryReady"))}</span></div>
+              <div class="summary-count"><strong>${data.handoff}</strong><span>${esc(tr("summaryHandoff"))}</span></div>
+            </div>
+            <div class="summary-box"><span class="summary-label">${esc(tr("summaryLabel"))}</span><p class="summary-text">${esc(summaryText())}</p></div>
+            <p class="not-client-metrics">${esc(tr("metricsDisclaimer"))}</p>
+            <button class="button secondary small" id="copySummary" type="button">${esc(tr("summaryCopy"))}</button>
+          </div>`;
+        $("#copySummary").addEventListener("click", async () => {
+          const ok = await copyText(summaryText());
+          announce(ok ? tr("summaryCopied") : tr("copyFailed"));
+        });
+      }
+
+      function takeConversation() {
+        const lead = activeLead();
+        if (lead.status === "owner") return;
+        lead.status = "owner";
+        state.messages.push({ role: "system", text: tr("ownerJoinMessage") });
+        renderChat();
+        renderOwner();
+        announce(tr("ownerActionDone"));
+      }
+
+      async function copyLead(lead) {
+        const text = format(tr("leadCardTemplate"), {
+          id: lead.id,
+          channel: lead.channel,
+          language: lead.language,
+          service: serviceText(lead),
+          request: requestText(lead),
+          status: statusText(lead.status)
+        });
+        const ok = await copyText(text);
+        announce(ok ? tr("leadCopied") : tr("copyFailed"));
+      }
+
+      async function copyText(text) {
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+            return true;
+          }
+          const area = document.createElement("textarea");
+          area.value = text;
+          area.setAttribute("readonly", "");
+          area.style.position = "fixed";
+          area.style.opacity = "0";
+          document.body.appendChild(area);
+          area.select();
+          const copied = document.execCommand("copy");
+          area.remove();
+          return copied;
+        } catch (_) {
+          return false;
+        }
+      }
+
+      function exportCsv() {
+        const quote = value => `"${String(value).replaceAll('"', '""')}"`;
+        const rows = [
+          ["demo_lead_id", "channel", "language", "service", "requested_time", "status"],
+          ...state.leads.map(lead => [lead.id, lead.channel, lead.language, serviceText(lead), requestText(lead), statusText(lead.status)])
+        ];
+        const csv = "\ufeff" + rows.map(row => row.map(quote).join(",")).join("\n");
+        const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "kav-demo-leads.csv";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 0);
+        announce(tr("csvReady"));
+      }
+
+      function handleCustomMessage(text) {
+        const clean = text.trim();
+        if (!clean) {
+          announce(tr("emptyMessage"));
+          return;
+        }
+        state.messages.push({ role: "customer", text: clean.slice(0, 240) });
+        const asksHuman = /(человек|владел|оператор|human|owner|אדם|בעל|מנהלת)/i.test(clean);
+        if (asksHuman) {
+          activeLead().status = "handoff";
+          state.stage = null;
+          state.messages.push({ role: "assistant", text: tr("customHandoff") });
+          state.messages.push({ role: "system", text: state.lang === "ru" ? "Создана явная задача владельцу." : "נוצרה משימה מפורשת לבעלת העסק." });
+          state.ownerView = "inbox";
+        } else {
+          state.messages.push({ role: "assistant", text: tr("customCaptured") });
+        }
+        renderChat();
+        renderOwner();
+      }
+
+      function applyPitch(event) {
+        event.preventDefault();
+        const business = $("#businessName").value.trim().replace(/\s+/g, " ");
+        const city = $("#cityName").value.trim().replace(/\s+/g, " ");
+        if (business) state.business = business.slice(0, 48);
+        if (city) state.city = city.slice(0, 40);
+        renderBusiness();
+        resetConversation();
+        renderOwner();
+        announce(tr("demoApplied"));
+      }
+
+      function resetAll() {
+        state.leads = defaultLeads();
+        state.scenario = "booking";
+        state.ownerView = "inbox";
+        activateScenario("booking");
+        announce(tr("demoReset"));
+      }
+
+      function changeLanguage(lang) {
+        if (!translations[lang] || lang === state.lang) return;
+        state.lang = lang;
+        translateStatic();
+        resetConversation();
+        renderOwner();
+        announce(tr("switchedLanguage"));
+      }
+
+      function offerText() {
+        return format(tr("offerTemplate"), { business: state.business, city: state.city });
+      }
+
+      function wireEvents() {
+        $$('[data-lang]').forEach(button => button.addEventListener("click", () => changeLanguage(button.dataset.lang)));
+        $$('.scenario-button').forEach(button => button.addEventListener("click", () => activateScenario(button.dataset.scenario, { resetLead: true })));
+        $$('[data-action="start-booking"]').forEach(link => link.addEventListener("click", () => activateScenario("booking", { resetLead: true })));
+        $$('[data-action="start-handoff"]').forEach(link => link.addEventListener("click", () => activateScenario("handoff", { resetLead: true })));
+        $$('.owner-tab').forEach(tab => tab.addEventListener("click", () => { state.ownerView = tab.dataset.ownerView; renderOwner(); }));
+        $("#pitchForm").addEventListener("submit", applyPitch);
+        $("#resetDemo").addEventListener("click", resetAll);
+        $("#chatForm").addEventListener("submit", event => {
+          event.preventDefault();
+          const input = $("#chatInput");
+          handleCustomMessage(input.value);
+          input.value = "";
+        });
+        $("#copyOffer").addEventListener("click", async () => {
+          const ok = await copyText(offerText());
+          $("#copyStatus").textContent = ok ? tr("offerCopied") : tr("copyFailed");
+          announce(ok ? tr("offerCopied") : tr("copyFailed"));
+        });
+      }
+
+      function init() {
+        translateStatic();
+        wireEvents();
+        activateScenario("booking");
+      }
+
+      window.__KAV_DEMO__ = {
+        getState: () => JSON.parse(JSON.stringify(state)),
+        setLanguage: changeLanguage,
+        setScenario: scenario => activateScenario(scenario, { resetLead: true }),
+        reset: resetAll,
+        getSummary: summaryText,
+        getOffer: offerText
+      };
+
+      init();
+    })();
+  </script>
+</body>
+</html>

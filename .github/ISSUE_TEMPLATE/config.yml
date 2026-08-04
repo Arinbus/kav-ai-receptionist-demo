@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Open the live demo
+    url: https://arinbus.github.io/kav-ai-receptionist-demo/
+    about: Explore the self-contained RU/HE prototype before requesting a tailored walkthrough.
