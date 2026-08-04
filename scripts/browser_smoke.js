@@ -235,6 +235,22 @@ async function dentalPresetFlow(browser) {
   assert.match(await page.locator("#chatLog").textContent(), /איני נותנת ייעוץ רפואי/);
   assert.doesNotMatch(await page.locator("#chatLog").textContent(), /תספורת|צביעה/);
 
+  const clinicUrl = new URL(baseUrl);
+  clinicUrl.searchParams.set("profile", "clinic");
+  clinicUrl.searchParams.set("business", "Animal Care Demo");
+  clinicUrl.searchParams.set("city", "Ramat Gan");
+  clinicUrl.searchParams.set("lang", "he");
+  await page.goto(clinicUrl.toString(), { waitUntil: "networkidle" });
+  await page.locator("#demo").waitFor();
+  state = await page.evaluate(() => window.__KAV_DEMO__.getState());
+  assert.equal(state.profile, "clinic");
+  assert.equal(state.business, "Animal Care Demo");
+  assert.equal(state.city, "Ramat Gan");
+  assert.equal(await page.locator("body").getAttribute("data-profile"), "clinic");
+  assert.match(await page.locator(".brand-sub").textContent(), /מרפאה/);
+  assert.match(await page.locator("#chatLog").textContent(), /איני נותנת ייעוץ רפואי/);
+  assert.doesNotMatch(await page.locator("#chatLog").textContent(), /תספורת|צביעה/);
+
   assert.deepEqual(diagnostics.errors, [], `dental browser errors: ${diagnostics.errors.join(" | ")}`);
   assert.deepEqual(diagnostics.failedRequests, [], `dental failed requests: ${diagnostics.failedRequests.join(" | ")}`);
   assert.deepEqual(diagnostics.externalRequests, [], `dental external requests: ${diagnostics.externalRequests.join(" | ")}`);
@@ -246,6 +262,7 @@ async function dentalPresetFlow(browser) {
     russianAdminOnly: "PASS",
     hebrewRtlAdminOnly: "PASS",
     medicalAdviceBoundary: "PASS",
+    clinicAlias: "PASS",
     booking: "PASS",
     handoff: "PASS",
     consoleErrors: 0,
