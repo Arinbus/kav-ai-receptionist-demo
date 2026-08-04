@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Локальный интерактивный RU/HE demo AI-рецепциониста для салона в Израиле: квалификация, заявка, human handoff, таблица лидов и сводка владельцу.">
+  <meta name="description" content="Локальный интерактивный RU/HE demo AI-рецепциониста для бизнеса в Израиле: административная заявка, human handoff, таблица лидов и сводка владельцу.">
   <meta name="color-scheme" content="light">
   <title>KAV / קו — demo AI-рецепциониста</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2317221d'/%3E%3Cpath d='M17 18v28M18 34l13-16M19 33l14 13M38 18v28M38 18h9' stroke='%23f6f1e7' stroke-width='6' fill='none'/%3E%3C/svg%3E">
@@ -1125,6 +1125,51 @@
         }
       };
 
+      const profileOverrides = {
+        dental: {
+          ru: {
+            brandSub: "RU/HE AI-администратор клиники",
+            heroEyebrow: "ИЗРАИЛЬ · КЛИНИКИ · RU / HE",
+            heroLead: "AI-администратор собирает только данные для записи и удобное время, создаёт карточку обращения и передаёт медицинские вопросы сотруднику клиники.",
+            path2Text: "тип записи, время, контекст",
+            rulesIntro: "Для клиники помощник собирает только административный контекст. Он не оценивает симптомы, не рекомендует лечение и не подтверждает свободное окно.",
+            rule4Text: "Любой медицинский вопрос, сомнение или просьба о человеке создают явную задачу сотруднику клиники без автоматического триажа.",
+            handoffNoteText: "В прототипе сотрудник клиники нажимает «Взять диалог», видит только административный контекст и продолжает общение. Реальные уведомления и маршрутизация настраиваются после подключения официальных каналов клиники.",
+            serviceHaircut: "Новая запись",
+            serviceColor: "Вопрос сотруднику клиники",
+            detailShoulder: "существующая запись",
+            detailLong: "новая запись",
+            takeConversation: "Взять диалог сотруднику",
+            markContact: "Отметить: сотрудник свяжется",
+            ownerConnected: "Сотрудник подключён",
+            ownerJoinMessage: "Сотрудник клиники подключился к демонстрационному диалогу и видит административный контекст.",
+            ownerActionDone: "Статус обновлён: сотрудник клиники подключён",
+            customHandoff: "Поняла. Я не оцениваю медицинские вопросы. Создаю задачу сотруднику клиники и передаю только административный контекст.",
+            offerTemplate: "Черновик предложения для {business}, {city}\n\nПилот RU/HE AI-администратора на одном административном процессе: запрос на запись, перенос/отмена, передача сотруднику, таблица обращений и дневная сводка. Медицинские советы и автоматический триаж исключены.\n\nПилот: ₪2,500–5,000.\nПоддержка: ₪600–2,000/месяц.\nОриентир: 7–10 рабочих дней после согласования процесса и получения доступов.\n\nТочная стоимость зависит от канала, объёма и интеграций. Внешние тарифы не включены. Реальные аккаунты подключаются только владельцем и после согласования прав доступа."
+          },
+          he: {
+            brandSub: "עוזרת קבלה חכמה למרפאה בעברית וברוסית",
+            heroEyebrow: "ישראל · מרפאות · עברית / רוסית",
+            heroLead: "עוזרת הקבלה אוספת רק פרטים מנהליים לקביעת תור וזמן רצוי, יוצרת כרטיס פנייה ומעבירה שאלות רפואיות לצוות המרפאה.",
+            path2Text: "סוג תור, זמן והקשר",
+            rulesIntro: "למרפאה, העוזרת אוספת רק הקשר מנהלי. היא אינה מעריכה תסמינים, אינה ממליצה על טיפול ואינה מאשרת שעה פנויה.",
+            rule4Text: "כל שאלה רפואית, ספק או בקשה לאדם יוצרים משימה מפורשת לצוות המרפאה ללא מיון אוטומטי.",
+            handoffNoteText: "בדמו איש צוות המרפאה לוקח את השיחה, רואה רק את ההקשר המנהלי וממשיך. התראות וניתוב אמיתיים מוגדרים לאחר חיבור הערוצים הרשמיים של המרפאה.",
+            serviceHaircut: "בקשת תור חדשה",
+            serviceColor: "שאלה לצוות המרפאה",
+            detailShoulder: "תור קיים",
+            detailLong: "תור חדש",
+            takeConversation: "העברה לאיש צוות",
+            markContact: "לסמן: הצוות יחזור",
+            ownerConnected: "איש צוות הצטרף",
+            ownerJoinMessage: "איש צוות המרפאה הצטרף לשיחת הדמו ורואה את ההקשר המנהלי.",
+            ownerActionDone: "הסטטוס עודכן: איש צוות המרפאה הצטרף",
+            customHandoff: "הבנתי. איני מעריכה שאלות רפואיות. אני יוצרת משימה לצוות המרפאה ומעבירה רק הקשר מנהלי.",
+            offerTemplate: "טיוטת הצעה עבור {business}, {city}\n\nפיילוט של עוזרת קבלה AI בעברית וברוסית בתהליך מנהלי אחד: בקשת תור, שינוי או ביטול, העברה לצוות, טבלת פניות וסיכום יומי. ייעוץ רפואי ומיון אוטומטי אינם כלולים.\n\nפיילוט: ₪2,500–5,000.\nתמיכה: ₪600–2,000 לחודש.\nיעד: 7–10 ימי עבודה לאחר אישור התהליך וקבלת הגישות.\n\nהמחיר המדויק תלוי בערוץ, בנפח ובאינטגרציות. תעריפים חיצוניים אינם כלולים. חשבונות אמיתיים מחוברים רק על ידי בעל העסק ולאחר אישור הרשאות."
+          }
+        }
+      };
+
       const flows = {
         booking: {
           channel: "WhatsApp",
@@ -1234,6 +1279,115 @@
         }
       };
 
+      const dentalFlows = {
+        booking: {
+          channel: "WhatsApp",
+          channelCode: "WA",
+          leadId: "D-101",
+          initialStage: "timing",
+          copy: {
+            ru: {
+              initial: [
+                ["assistant", "Здравствуйте! Я цифровой RU/HE AI-администратор {business}. Помогу оформить только административный запрос на запись; медицинских советов я не даю. В любой момент можно попросить сотрудника клиники."],
+                ["customer", "Здравствуйте, хочу записаться на первичный приём."],
+                ["assistant", "Помогу оформить запрос. Какой день и время вам удобны?"]
+              ],
+              stages: {
+                timing: [
+                  { id: "tomorrow", label: "Завтра после 17:00", reply: "Могу отметить 18:30 или 19:15. Какой вариант передать сотруднику как желаемый?", next: "tomorrowSlots" },
+                  { id: "friday", label: "В пятницу утром", reply: "Могу отметить 09:30 или 11:00. Какой вариант передать сотруднику как желаемый?", next: "fridaySlots" }
+                ],
+                tomorrowSlots: [
+                  { id: "t1830", label: "18:30", reply: "Зафиксировать контакт из этого WhatsApp-чата и передать сотруднику клиники запрос на 18:30? Время ещё не подтверждено.", next: "confirm", request: "requestTomorrow1830" },
+                  { id: "t1915", label: "19:15", reply: "Зафиксировать контакт из этого WhatsApp-чата и передать сотруднику клиники запрос на 19:15? Время ещё не подтверждено.", next: "confirm", request: "requestTomorrow1915" }
+                ],
+                fridaySlots: [
+                  { id: "f0930", label: "09:30", reply: "Зафиксировать контакт из этого WhatsApp-чата и передать сотруднику клиники запрос на пятницу, 09:30? Время ещё не подтверждено.", next: "confirm", request: "requestFriday0930" },
+                  { id: "f1100", label: "11:00", reply: "Зафиксировать контакт из этого WhatsApp-чата и передать сотруднику клиники запрос на пятницу, 11:00? Время ещё не подтверждено.", next: "confirm", request: "requestFriday1100" }
+                ],
+                confirm: [
+                  { id: "create", label: "Да, создать запрос", reply: "Готово. Демо-запрос D-101 передан сотруднику клиники. Он проверит время и ответит здесь — запись пока не подтверждена.", final: "new" },
+                  { id: "human", label: "Сначала поговорить с сотрудником", reply: "Поняла. Передаю сотруднику клиники административный контекст и отмечаю, что нужен личный ответ.", final: "handoff" }
+                ]
+              }
+            },
+            he: {
+              initial: [
+                ["assistant", "שלום! אני עוזרת הקבלה הדיגיטלית מבוססת AI של {business} בעברית וברוסית. אעזור רק בבקשת תור מנהלית ואיני נותנת ייעוץ רפואי. בכל שלב אפשר לבקש איש צוות."],
+                ["customer", "שלום, אני רוצה לקבוע תור ראשון."],
+                ["assistant", "אעזור להכין את הבקשה. איזה יום ושעה נוחים לך?"]
+              ],
+              stages: {
+                timing: [
+                  { id: "tomorrow", label: "מחר אחרי 17:00", reply: "אפשר לסמן 18:30 או 19:15. איזו שעה להעביר לצוות כשעה רצויה?", next: "tomorrowSlots" },
+                  { id: "friday", label: "יום שישי בבוקר", reply: "אפשר לסמן 09:30 או 11:00. איזו שעה להעביר לצוות כשעה רצויה?", next: "fridaySlots" }
+                ],
+                tomorrowSlots: [
+                  { id: "t1830", label: "18:30", reply: "לשמור את איש הקשר מצ'אט ה-WhatsApp ולהעביר לצוות המרפאה בקשה ל-18:30? השעה עדיין לא מאושרת.", next: "confirm", request: "requestTomorrow1830" },
+                  { id: "t1915", label: "19:15", reply: "לשמור את איש הקשר מצ'אט ה-WhatsApp ולהעביר לצוות המרפאה בקשה ל-19:15? השעה עדיין לא מאושרת.", next: "confirm", request: "requestTomorrow1915" }
+                ],
+                fridaySlots: [
+                  { id: "f0930", label: "09:30", reply: "לשמור את איש הקשר מהצ'אט ולהעביר לצוות המרפאה בקשה ליום שישי ב-09:30? השעה עדיין לא מאושרת.", next: "confirm", request: "requestFriday0930" },
+                  { id: "f1100", label: "11:00", reply: "לשמור את איש הקשר מהצ'אט ולהעביר לצוות המרפאה בקשה ליום שישי ב-11:00? השעה עדיין לא מאושרת.", next: "confirm", request: "requestFriday1100" }
+                ],
+                confirm: [
+                  { id: "create", label: "כן, ליצור בקשה", reply: "בוצע. בקשת הדמו D-101 הועברה לצוות המרפאה. הצוות יבדוק את השעה ויענה כאן — התור עדיין לא מאושר.", final: "new" },
+                  { id: "human", label: "קודם לדבר עם איש צוות", reply: "הבנתי. אני מעבירה לצוות המרפאה את ההקשר המנהלי ומסמנת שנדרש מענה אישי.", final: "handoff" }
+                ]
+              }
+            }
+          }
+        },
+        handoff: {
+          channel: "Telegram",
+          channelCode: "TG",
+          leadId: "D-102",
+          initialStage: "appointmentType",
+          copy: {
+            ru: {
+              initial: [
+                ["assistant", "Здравствуйте! Я цифровой RU/HE AI-администратор {business}. Соберу только административные данные; медицинских советов и триажа я не даю."],
+                ["customer", "У меня вопрос по лечению, и я хочу поговорить с сотрудником клиники."],
+                ["assistant", "Конечно. Я не оцениваю симптомы. Чтобы передать только административный контекст: вопрос относится к существующей записи или к новой?"]
+              ],
+              stages: {
+                appointmentType: [
+                  { id: "existing", label: "Есть существующая запись", reply: "Спасибо. Когда сотруднику клиники удобнее ответить?", next: "replyTime", detail: "detailShoulder" },
+                  { id: "new", label: "Новая запись", reply: "Спасибо. Когда сотруднику клиники удобнее ответить?", next: "replyTime", detail: "detailLong" }
+                ],
+                replyTime: [
+                  { id: "today", label: "Сегодня после 18:00", reply: "Передать сотруднику выбранный тип записи и просьбу ответить сегодня после 18:00? Медицинские детали в демо не собираются.", next: "handoffConfirm", request: "requestToday1800" },
+                  { id: "morning", label: "Завтра утром", reply: "Передать сотруднику выбранный тип записи и просьбу ответить завтра утром? Медицинские детали в демо не собираются.", next: "handoffConfirm", request: "requestTomorrowMorning" }
+                ],
+                handoffConfirm: [
+                  { id: "handoff", label: "Да, передать сотруднику", reply: "Готово. Демо-обращение D-102 отмечено как «Нужен сотрудник клиники». Он увидит административный контекст и продолжит здесь.", final: "handoff" }
+                ]
+              }
+            },
+            he: {
+              initial: [
+                ["assistant", "שלום! אני עוזרת הקבלה הדיגיטלית מבוססת AI של {business} בעברית וברוסית. אאסוף רק פרטים מנהליים; איני נותנת ייעוץ רפואי או מבצעת מיון."],
+                ["customer", "יש לי שאלה על טיפול ואני רוצה לדבר עם איש צוות במרפאה."],
+                ["assistant", "בהחלט. איני מעריכה תסמינים. כדי להעביר רק הקשר מנהלי: השאלה קשורה לתור קיים או לתור חדש?"]
+              ],
+              stages: {
+                appointmentType: [
+                  { id: "existing", label: "יש תור קיים", reply: "תודה. מתי נוח שאיש צוות המרפאה יחזור אלייך?", next: "replyTime", detail: "detailShoulder" },
+                  { id: "new", label: "תור חדש", reply: "תודה. מתי נוח שאיש צוות המרפאה יחזור אלייך?", next: "replyTime", detail: "detailLong" }
+                ],
+                replyTime: [
+                  { id: "today", label: "היום אחרי 18:00", reply: "להעביר לצוות את סוג התור שנבחר ובקשה למענה היום אחרי 18:00? פרטים רפואיים אינם נאספים בדמו.", next: "handoffConfirm", request: "requestToday1800" },
+                  { id: "morning", label: "מחר בבוקר", reply: "להעביר לצוות את סוג התור שנבחר ובקשה למענה מחר בבוקר? פרטים רפואיים אינם נאספים בדמו.", next: "handoffConfirm", request: "requestTomorrowMorning" }
+                ],
+                handoffConfirm: [
+                  { id: "handoff", label: "כן, להעביר לצוות", reply: "בוצע. פניית הדמו D-102 סומנה כ\"נדרש צוות המרפאה\". הצוות יראה את ההקשר המנהלי וימשיך כאן.", final: "handoff" }
+                ]
+              }
+            }
+          }
+        }
+      };
+
       function defaultLeads() {
         return [
           { id: "D-101", scenario: "booking", channel: "WhatsApp", language: "RU", serviceKey: "serviceHaircut", requestKey: "requestCollecting", detailKey: "", status: "qualifying" },
@@ -1241,23 +1395,33 @@
         ];
       }
 
+      const query = new URLSearchParams(window.location.search);
+      const initialProfile = query.get("profile") === "dental" ? "dental" : "salon";
+      const initialLang = query.get("lang") === "he" ? "he" : "ru";
+      const boundedQuery = (name, fallback, limit) => {
+        const value = (query.get(name) || "").trim().replace(/\s+/g, " ");
+        return (value || fallback).slice(0, limit);
+      };
+      const defaultBusiness = initialProfile === "dental" ? "Demo Clinic" : "NOGA Studio";
+
       const state = {
-        lang: "ru",
+        profile: initialProfile,
+        lang: initialLang,
         scenario: "booking",
         stage: "timing",
         messages: [],
         ownerView: "inbox",
-        business: "NOGA Studio",
-        city: "Tel Aviv",
+        business: boundedQuery("business", defaultBusiness, 48),
+        city: boundedQuery("city", "Tel Aviv", 40),
         leads: defaultLeads()
       };
 
       const $ = (selector, root = document) => root.querySelector(selector);
       const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
-      const tr = (key) => translations[state.lang][key] ?? key;
+      const tr = (key) => profileOverrides[state.profile]?.[state.lang]?.[key] ?? translations[state.lang][key] ?? key;
       const format = (template, values) => Object.entries(values).reduce((text, [key, value]) => text.replaceAll(`{${key}}`, String(value)), template);
       const esc = (value) => String(value).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
-      const activeFlow = () => flows[state.scenario];
+      const activeFlow = () => (state.profile === "dental" ? dentalFlows : flows)[state.scenario];
       const activeLead = () => state.leads.find(lead => lead.id === activeFlow().leadId);
       const flowCopy = () => activeFlow().copy[state.lang];
 
@@ -1637,6 +1801,9 @@
       }
 
       function init() {
+        document.body.dataset.profile = state.profile;
+        $("#businessName").value = state.business;
+        $("#cityName").value = state.city;
         translateStatic();
         wireEvents();
         activateScenario("booking");

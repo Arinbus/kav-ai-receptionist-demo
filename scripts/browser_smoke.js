@@ -185,6 +185,70 @@ async function mobileFlow(browser) {
   };
 }
 
+async function dentalPresetFlow(browser) {
+  const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, locale: "ru-RU" });
+  const page = await context.newPage();
+  const diagnostics = collectDiagnostics(page);
+  const url = new URL(baseUrl);
+  url.searchParams.set("profile", "dental");
+  url.searchParams.set("business", "Shenhavit Dental Center");
+  url.searchParams.set("city", "Bat Yam");
+  url.searchParams.set("lang", "ru");
+
+  await page.goto(url.toString(), { waitUntil: "networkidle" });
+  await page.locator("#demo").waitFor();
+
+  let state = await page.evaluate(() => window.__KAV_DEMO__.getState());
+  assert.equal(state.profile, "dental");
+  assert.equal(state.business, "Shenhavit Dental Center");
+  assert.equal(state.city, "Bat Yam");
+  assert.equal(await page.locator("body").getAttribute("data-profile"), "dental");
+  assert.match(await page.locator(".brand-sub").textContent(), /клиники/);
+  assert.match(await page.locator(".hero-lead").textContent(), /медицинские вопросы/);
+  assert.match(await page.locator("#chatLog").textContent(), /медицинских советов я не даю/);
+  assert.doesNotMatch(await page.locator("#chatLog").textContent(), /стриж|окраш/i);
+
+  await page.locator('[data-choice="tomorrow"]').click();
+  await page.locator('[data-choice="t1830"]').click();
+  await page.locator('[data-choice="create"]').click();
+  state = await page.evaluate(() => window.__KAV_DEMO__.getState());
+  assert.equal(state.leads[0].status, "new");
+  assert.match(await page.locator("#ownerView").textContent(), /Новая запись/);
+
+  await page.locator('[data-scenario="handoff"]').click();
+  assert.match(await page.locator("#chatLog").textContent(), /не оцениваю симптомы/);
+  await page.locator('[data-choice="existing"]').click();
+  await page.locator('[data-choice="today"]').click();
+  await page.locator('[data-choice="handoff"]').click();
+  state = await page.evaluate(() => window.__KAV_DEMO__.getState());
+  assert.equal(state.leads[1].status, "handoff");
+  assert.equal(state.leads[1].detailKey, "detailShoulder");
+
+  await page.locator('[data-lang="he"]').click();
+  assert.equal(await page.locator("html").getAttribute("dir"), "rtl");
+  assert.match(await page.locator(".brand-sub").textContent(), /מרפאה/);
+  assert.match(await page.locator("#chatLog").textContent(), /איני נותנת ייעוץ רפואי/);
+  assert.doesNotMatch(await page.locator("#chatLog").textContent(), /תספורת|צביעה/);
+
+  assert.deepEqual(diagnostics.errors, [], `dental browser errors: ${diagnostics.errors.join(" | ")}`);
+  assert.deepEqual(diagnostics.failedRequests, [], `dental failed requests: ${diagnostics.failedRequests.join(" | ")}`);
+  assert.deepEqual(diagnostics.externalRequests, [], `dental external requests: ${diagnostics.externalRequests.join(" | ")}`);
+
+  await context.close();
+  return {
+    profile: "dental",
+    personalizedBusiness: "PASS",
+    russianAdminOnly: "PASS",
+    hebrewRtlAdminOnly: "PASS",
+    medicalAdviceBoundary: "PASS",
+    booking: "PASS",
+    handoff: "PASS",
+    consoleErrors: 0,
+    failedRequests: 0,
+    externalRequests: 0,
+  };
+}
+
 (async () => {
   const browser = await chromium.launch({
     executablePath: chromePath,
@@ -194,7 +258,8 @@ async function mobileFlow(browser) {
   try {
     const desktop = await desktopFlow(browser);
     const mobile = await mobileFlow(browser);
-    console.log(JSON.stringify({ result: "PASS", desktop, mobile }, null, 2));
+    const dentalPreset = await dentalPresetFlow(browser);
+    console.log(JSON.stringify({ result: "PASS", desktop, mobile, dentalPreset }, null, 2));
   } finally {
     await browser.close();
   }

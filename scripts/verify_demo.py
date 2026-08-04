@@ -36,6 +36,11 @@ REQUIRED_TEXT = {
     "ДЕМО-ДАННЫЕ",
     "נתוני דמו",
     "window.__KAV_DEMO__",
+    "profileOverrides",
+    "dentalFlows",
+    'query.get("profile") === "dental"',
+    "медицинских советов я не даю",
+    "איני נותנת ייעוץ רפואי",
 }
 
 
@@ -125,7 +130,7 @@ def main() -> None:
 
     print("PASS: index.html is self-contained")
     print(f"PASS: {len(parser.ids)} unique element IDs; required UI anchors present")
-    print("PASS: RU/HE copy, both channels, pricing, handoff, and test API markers present")
+    print("PASS: RU/HE salon and dental copy, both channels, pricing, handoff, and test API markers present")
     print("PASS: inline JavaScript passes node --check")
 
 
