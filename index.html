@@ -1172,6 +1172,7 @@
           }
         }
       };
+      profileOverrides.clinic = profileOverrides.dental;
 
       const flows = {
         booking: {
@@ -1399,13 +1400,14 @@
       }
 
       const query = new URLSearchParams(window.location.search);
-      const initialProfile = query.get("profile") === "dental" ? "dental" : "salon";
+      const requestedProfile = query.get("profile");
+      const initialProfile = ["dental", "clinic"].includes(requestedProfile) ? requestedProfile : "salon";
       const initialLang = query.get("lang") === "he" ? "he" : "ru";
       const boundedQuery = (name, fallback, limit) => {
         const value = (query.get(name) || "").trim().replace(/\s+/g, " ");
         return (value || fallback).slice(0, limit);
       };
-      const defaultBusiness = initialProfile === "dental" ? "Demo Clinic" : "NOGA Studio";
+      const defaultBusiness = initialProfile === "salon" ? "NOGA Studio" : "Demo Clinic";
 
       const state = {
         profile: initialProfile,
@@ -1424,7 +1426,7 @@
       const tr = (key) => profileOverrides[state.profile]?.[state.lang]?.[key] ?? translations[state.lang][key] ?? key;
       const format = (template, values) => Object.entries(values).reduce((text, [key, value]) => text.replaceAll(`{${key}}`, String(value)), template);
       const esc = (value) => String(value).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
-      const activeFlow = () => (state.profile === "dental" ? dentalFlows : flows)[state.scenario];
+      const activeFlow = () => (state.profile === "salon" ? flows : dentalFlows)[state.scenario];
       const activeLead = () => state.leads.find(lead => lead.id === activeFlow().leadId);
       const flowCopy = () => activeFlow().copy[state.lang];
 
