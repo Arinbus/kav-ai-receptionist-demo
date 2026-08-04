@@ -110,3 +110,24 @@ node scripts/browser_smoke.js http://127.0.0.1:8765/
 - Это детерминированная локальная симуляция, а не подключённая AI/WhatsApp/Telegram-система.
 - CSV и clipboard работают только локально в браузере.
 - Реальные интеграции и уведомления требуют отдельного пилота, официальных доступов владельца и end-to-end приёмки.
+
+## Дополнительная проверка clinic-safe preset — 2026-08-04T16:26:46+03:00
+
+Добавлен адресный `profile=dental` с ограниченными query-параметрами `business`, `city`, `lang=ru|he`. Значения остаются в браузере и отображаются как текст; профиль не создаёт сетевых запросов.
+
+Повторно выполнены static verifier и полный Playwright smoke. Итог: **PASS**.
+
+- исходный salon desktop flow: PASS;
+- исходный mobile touch flow: PASS;
+- dental RU booking: PASS;
+- dental RU explicit staff handoff: PASS;
+- dental HE RTL после переключения: PASS;
+- отсутствие salon-only `стрижка/окрашивание` и `תספורת/צביעה` в dental chat: PASS;
+- явный запрет медицинских советов/оценки симптомов/автоматического триажа: PASS;
+- console errors: `0`;
+- failed requests: `0`;
+- external requests: `0`.
+
+Проверенный адресный пример:
+
+`/?profile=dental&business=Shenhavit+Dental+Center&city=Bat+Yam&lang=ru`

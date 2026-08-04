@@ -13,9 +13,18 @@ Interactive RU/HE prototype of a narrow AI receptionist for Israeli local busine
 - Russian and Hebrew UI with correct LTR/RTL direction;
 - owner inbox, structured lead card, lead table, daily summary, takeover and CSV export;
 - conservative boundaries: requested time is not a confirmed booking, unusual questions go to a person, and no medical advice is generated;
-- business name and city can be personalized locally in the browser.
+- business name and city can be personalized locally in the browser;
+- a reusable clinic-safe preset can be opened through query parameters without sending data anywhere; it limits the scripted flow to administrative booking and staff handoff, with no diagnosis, symptom assessment, treatment advice, or automated triage.
 
 Everything is deterministic and self-contained in `index.html`. The demo does **not** connect to WhatsApp, Telegram, calendars, external APIs, or real customer data.
+
+### Clinic-safe direct demo
+
+Use `profile=dental` with optional bounded `business`, `city`, and `lang=ru|he` parameters. The values stay inside the browser tab and are rendered as text, not sent to a server.
+
+<https://arinbus.github.io/kav-ai-receptionist-demo/?profile=dental&business=Demo%20Clinic&city=Bat%20Yam&lang=ru>
+
+The clinic preset demonstrates administrative new-booking intake and explicit staff handoff. It deliberately does not collect symptoms or medical history and never diagnoses, recommends treatment, or triages urgency.
 
 ## Pilot outline
 
