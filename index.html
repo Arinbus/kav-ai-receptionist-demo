@@ -1173,6 +1173,56 @@
         }
       };
       profileOverrides.clinic = profileOverrides.dental;
+      profileOverrides.realestate = {
+        ru: {
+          brandSub: "RU/HE AI-координатор для агентства недвижимости",
+          heroEyebrow: "ИЗРАИЛЬ · НЕДВИЖИМОСТЬ · RU / HE",
+          heroLead: "AI-координатор уточняет цель обращения, тип объекта и удобное время ответа, создаёт карточку лида и передаёт переговоры агенту.",
+          path2Text: "продажа/покупка, объект, срок",
+          scenarioBooking: "WhatsApp · продавец объекта",
+          scenarioHandoff: "Telegram · нужен агент",
+          rulesIntro: "Для агентства помощник собирает только операционный контекст. Он не оценивает недвижимость, не обещает цену или сделку и не даёт юридических либо финансовых советов.",
+          rule2Title: "Заявка ≠ оценка или договорённость",
+          rule2Text: "Пожелания и время звонка передаются агенту; стоимость объекта, условия и просмотр подтверждает только человек.",
+          rule4Text: "Вопрос о цене, переговорах, документах или просьба о человеке создают явную задачу агенту.",
+          handoffNoteText: "В прототипе агент нажимает «Взять диалог», видит собранный контекст и продолжает общение. Реальные уведомления и маршрутизация настраиваются после подключения официальных каналов агентства.",
+          serviceHaircut: "Продажа / оценка объекта",
+          serviceColor: "Покупка / вопрос агенту",
+          detailShoulder: "квартира",
+          detailLong: "частный дом",
+          takeConversation: "Взять диалог агенту",
+          markContact: "Отметить: агент свяжется",
+          ownerConnected: "Агент подключён",
+          ownerJoinMessage: "Агент подключился к демонстрационному диалогу и видит собранный операционный контекст.",
+          ownerActionDone: "Статус обновлён: агент подключён",
+          customHandoff: "Поняла. Создаю задачу агенту и передаю собранный контекст без оценки объекта или обещаний.",
+          offerTemplate: "Черновик предложения для {business}, {city}\n\nПилот RU/HE AI-координатора на одном входящем процессе: цель обращения, тип объекта, удобное время ответа, передача агенту, таблица лидов и дневная сводка. Автоматическая оценка, юридические и финансовые советы исключены.\n\nПилот: ₪2,500–5,000.\nПоддержка: ₪600–2,000/месяц.\nОриентир: 7–10 рабочих дней после согласования процесса и получения доступов.\n\nТочная стоимость зависит от канала, объёма и интеграций. Внешние тарифы не включены. Реальные аккаунты подключаются только владельцем и после согласования прав доступа."
+        },
+        he: {
+          brandSub: "מתאמת AI למשרד תיווך בעברית וברוסית",
+          heroEyebrow: "ישראל · נדל״ן · עברית / רוסית",
+          heroLead: "מתאמת AI מבררת את מטרת הפנייה, סוג הנכס והזמן הנוח לחזרה, יוצרת כרטיס ליד ומעבירה את המשא ומתן לסוכן.",
+          path2Text: "מכירה/קנייה, סוג נכס וטווח זמן",
+          scenarioBooking: "WhatsApp · מוכר נכס",
+          scenarioHandoff: "Telegram · צריך סוכן",
+          rulesIntro: "למשרד תיווך, העוזרת אוספת רק הקשר תפעולי. היא אינה מעריכה נכס, אינה מבטיחה מחיר או עסקה ואינה נותנת ייעוץ משפטי או פיננסי.",
+          rule2Title: "פנייה אינה הערכת שווי או התחייבות",
+          rule2Text: "הבקשה וזמן החזרה מועברים לסוכן; רק אדם מאשר שווי, תנאים או ביקור בנכס.",
+          rule4Text: "שאלה על מחיר, משא ומתן, מסמכים או בקשה לאדם יוצרים משימה מפורשת לסוכן.",
+          handoffNoteText: "בדמו הסוכן לוקח את השיחה, רואה את ההקשר שנאסף וממשיך. התראות וניתוב אמיתיים מוגדרים לאחר חיבור הערוצים הרשמיים של המשרד.",
+          serviceHaircut: "מכירה / הערכת נכס",
+          serviceColor: "קנייה / שאלה לסוכן",
+          detailShoulder: "דירה",
+          detailLong: "בית פרטי",
+          takeConversation: "להעביר לסוכן",
+          markContact: "לסמן: הסוכן יחזור",
+          ownerConnected: "הסוכן הצטרף",
+          ownerJoinMessage: "הסוכן הצטרף לשיחת הדמו ורואה את ההקשר התפעולי שנאסף.",
+          ownerActionDone: "הסטטוס עודכן: הסוכן הצטרף",
+          customHandoff: "הבנתי. אני יוצרת משימה לסוכן ומעבירה את ההקשר בלי הערכת נכס או הבטחות.",
+          offerTemplate: "טיוטת הצעה עבור {business}, {city}\n\nפיילוט של מתאמת AI בעברית וברוסית בתהליך נכנס אחד: מטרת הפנייה, סוג הנכס, זמן נוח לחזרה, העברה לסוכן, טבלת לידים וסיכום יומי. הערכת שווי אוטומטית וייעוץ משפטי או פיננסי אינם כלולים.\n\nפיילוט: ₪2,500–5,000.\nתמיכה: ₪600–2,000 לחודש.\nיעד: 7–10 ימי עבודה לאחר אישור התהליך וקבלת הגישות.\n\nהמחיר המדויק תלוי בערוץ, בנפח ובאינטגרציות. תעריפים חיצוניים אינם כלולים. חשבונות אמיתיים מחוברים רק על ידי בעל העסק ולאחר אישור הרשאות."
+        }
+      };
 
       const flows = {
         booking: {
@@ -1392,6 +1442,107 @@
         }
       };
 
+      const realEstateFlows = {
+        booking: {
+          channel: "WhatsApp",
+          channelCode: "WA",
+          leadId: "D-101",
+          initialStage: "propertyType",
+          copy: {
+            ru: {
+              initial: [
+                ["assistant", "Здравствуйте! Я цифровой RU/HE AI-координатор {business}. Помогу оформить обращение по недвижимости; оценку и условия подтверждает только агент."],
+                ["customer", "Здравствуйте, хочу продать объект в {city} и получить оценку."],
+                ["assistant", "Соберу короткий контекст для агента. Это квартира или частный дом?"]
+              ],
+              stages: {
+                propertyType: [
+                  { id: "apartment", label: "Квартира", reply: "Спасибо. Когда агенту удобнее связаться с вами?", next: "replyTime", detail: "detailShoulder" },
+                  { id: "house", label: "Частный дом", reply: "Спасибо. Когда агенту удобнее связаться с вами?", next: "replyTime", detail: "detailLong" }
+                ],
+                replyTime: [
+                  { id: "today", label: "Сегодня после 18:00", reply: "Передать агенту тип объекта и просьбу ответить сегодня после 18:00? Это заявка на связь, не оценка стоимости.", next: "confirm", request: "requestToday1800" },
+                  { id: "morning", label: "Завтра утром", reply: "Передать агенту тип объекта и просьбу ответить завтра утром? Это заявка на связь, не оценка стоимости.", next: "confirm", request: "requestTomorrowMorning" }
+                ],
+                confirm: [
+                  { id: "create", label: "Да, создать заявку", reply: "Готово. Демо-лид D-101 передан агенту. Он проверит контекст и ответит здесь; стоимость и условия пока не обсуждались.", final: "new" },
+                  { id: "human", label: "Сразу поговорить с агентом", reply: "Поняла. Передаю агенту собранный контекст и отмечаю, что нужен личный ответ.", final: "handoff" }
+                ]
+              }
+            },
+            he: {
+              initial: [
+                ["assistant", "שלום! אני מתאמת ה-AI הדיגיטלית של {business} בעברית וברוסית. אעזור להכין פנייה בנושא נדל״ן; רק סוכן מאשר שווי ותנאים."],
+                ["customer", "שלום, אני רוצה למכור נכס ב-{city} ולקבל הערכת שווי."],
+                ["assistant", "אאסוף הקשר קצר לסוכן. מדובר בדירה או בבית פרטי?"]
+              ],
+              stages: {
+                propertyType: [
+                  { id: "apartment", label: "דירה", reply: "תודה. מתי נוח שהסוכן יחזור אליך?", next: "replyTime", detail: "detailShoulder" },
+                  { id: "house", label: "בית פרטי", reply: "תודה. מתי נוח שהסוכן יחזור אליך?", next: "replyTime", detail: "detailLong" }
+                ],
+                replyTime: [
+                  { id: "today", label: "היום אחרי 18:00", reply: "להעביר לסוכן את סוג הנכס ובקשה למענה היום אחרי 18:00? זו בקשת חזרה, לא הערכת שווי.", next: "confirm", request: "requestToday1800" },
+                  { id: "morning", label: "מחר בבוקר", reply: "להעביר לסוכן את סוג הנכס ובקשה למענה מחר בבוקר? זו בקשת חזרה, לא הערכת שווי.", next: "confirm", request: "requestTomorrowMorning" }
+                ],
+                confirm: [
+                  { id: "create", label: "כן, ליצור פנייה", reply: "בוצע. ליד הדמו D-101 הועבר לסוכן. הוא יבדוק את ההקשר ויענה כאן; שווי ותנאים טרם נדונו.", final: "new" },
+                  { id: "human", label: "לדבר עכשיו עם סוכן", reply: "הבנתי. אני מעבירה לסוכן את ההקשר ומסמנת שנדרש מענה אישי.", final: "handoff" }
+                ]
+              }
+            }
+          }
+        },
+        handoff: {
+          channel: "Telegram",
+          channelCode: "TG",
+          leadId: "D-102",
+          initialStage: "propertyType",
+          copy: {
+            ru: {
+              initial: [
+                ["assistant", "Здравствуйте! Я цифровой RU/HE AI-координатор {business}. Соберу только операционный контекст; цену, документы и условия обсуждает агент."],
+                ["customer", "Меня интересует покупка объекта, и я хочу поговорить с агентом."],
+                ["assistant", "Конечно. Какой тип объекта вас интересует?"]
+              ],
+              stages: {
+                propertyType: [
+                  { id: "apartment", label: "Квартира", reply: "Спасибо. Когда агенту лучше ответить?", next: "replyTime", detail: "detailShoulder" },
+                  { id: "house", label: "Частный дом", reply: "Спасибо. Когда агенту лучше ответить?", next: "replyTime", detail: "detailLong" }
+                ],
+                replyTime: [
+                  { id: "today", label: "Сегодня после 18:00", reply: "Передать агенту интерес к выбранному типу объекта и просьбу ответить сегодня после 18:00? Я не обещаю наличие или цену.", next: "handoffConfirm", request: "requestToday1800" },
+                  { id: "morning", label: "Завтра утром", reply: "Передать агенту интерес к выбранному типу объекта и просьбу ответить завтра утром? Я не обещаю наличие или цену.", next: "handoffConfirm", request: "requestTomorrowMorning" }
+                ],
+                handoffConfirm: [
+                  { id: "handoff", label: "Да, передать агенту", reply: "Готово. Демо-лид D-102 отмечен как «Нужен агент». Он увидит контекст и продолжит здесь.", final: "handoff" }
+                ]
+              }
+            },
+            he: {
+              initial: [
+                ["assistant", "שלום! אני מתאמת ה-AI הדיגיטלית של {business} בעברית וברוסית. אאסוף רק הקשר תפעולי; מחיר, מסמכים ותנאים נדונים עם סוכן."],
+                ["customer", "אני מתעניין בקניית נכס ורוצה לדבר עם סוכן."],
+                ["assistant", "בהחלט. איזה סוג נכס מעניין אותך?"]
+              ],
+              stages: {
+                propertyType: [
+                  { id: "apartment", label: "דירה", reply: "תודה. מתי נוח שהסוכן יחזור אליך?", next: "replyTime", detail: "detailShoulder" },
+                  { id: "house", label: "בית פרטי", reply: "תודה. מתי נוח שהסוכן יחזור אליך?", next: "replyTime", detail: "detailLong" }
+                ],
+                replyTime: [
+                  { id: "today", label: "היום אחרי 18:00", reply: "להעביר לסוכן עניין בסוג הנכס שנבחר ובקשה למענה היום אחרי 18:00? איני מבטיחה זמינות או מחיר.", next: "handoffConfirm", request: "requestToday1800" },
+                  { id: "morning", label: "מחר בבוקר", reply: "להעביר לסוכן עניין בסוג הנכס שנבחר ובקשה למענה מחר בבוקר? איני מבטיחה זמינות או מחיר.", next: "handoffConfirm", request: "requestTomorrowMorning" }
+                ],
+                handoffConfirm: [
+                  { id: "handoff", label: "כן, להעביר לסוכן", reply: "בוצע. ליד הדמו D-102 סומן כ\"נדרש סוכן\". הסוכן יראה את ההקשר וימשיך כאן.", final: "handoff" }
+                ]
+              }
+            }
+          }
+        }
+      };
+
       function defaultLeads() {
         return [
           { id: "D-101", scenario: "booking", channel: "WhatsApp", language: "RU", serviceKey: "serviceHaircut", requestKey: "requestCollecting", detailKey: "", status: "qualifying" },
@@ -1401,13 +1552,13 @@
 
       const query = new URLSearchParams(window.location.search);
       const requestedProfile = query.get("profile");
-      const initialProfile = ["dental", "clinic"].includes(requestedProfile) ? requestedProfile : "salon";
+      const initialProfile = ["dental", "clinic", "realestate"].includes(requestedProfile) ? requestedProfile : "salon";
       const initialLang = query.get("lang") === "he" ? "he" : "ru";
       const boundedQuery = (name, fallback, limit) => {
         const value = (query.get(name) || "").trim().replace(/\s+/g, " ");
         return (value || fallback).slice(0, limit);
       };
-      const defaultBusiness = initialProfile === "salon" ? "NOGA Studio" : "Demo Clinic";
+      const defaultBusiness = initialProfile === "salon" ? "NOGA Studio" : initialProfile === "realestate" ? "Demo Realty" : "Demo Clinic";
 
       const state = {
         profile: initialProfile,
@@ -1426,7 +1577,8 @@
       const tr = (key) => profileOverrides[state.profile]?.[state.lang]?.[key] ?? translations[state.lang][key] ?? key;
       const format = (template, values) => Object.entries(values).reduce((text, [key, value]) => text.replaceAll(`{${key}}`, String(value)), template);
       const esc = (value) => String(value).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
-      const activeFlow = () => (state.profile === "salon" ? flows : dentalFlows)[state.scenario];
+      const flowSets = { salon: flows, dental: dentalFlows, clinic: dentalFlows, realestate: realEstateFlows };
+      const activeFlow = () => flowSets[state.profile][state.scenario];
       const activeLead = () => state.leads.find(lead => lead.id === activeFlow().leadId);
       const flowCopy = () => activeFlow().copy[state.lang];
 
