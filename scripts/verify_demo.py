@@ -37,8 +37,10 @@ REQUIRED_TEXT = {
     "נתוני דמו",
     "window.__KAV_DEMO__",
     "profileOverrides.clinic = profileOverrides.dental;",
+    "profileOverrides.realestate",
     "dentalFlows",
-    '["dental", "clinic"].includes(requestedProfile)',
+    "realEstateFlows",
+    '["dental", "clinic", "realestate"].includes(requestedProfile)',
     "медицинских советов я не даю",
     "איני נותנת ייעוץ רפואי",
     "https://t.me/Liraagi",
@@ -132,7 +134,7 @@ def main() -> None:
 
     print("PASS: index.html is self-contained")
     print(f"PASS: {len(parser.ids)} unique element IDs; required UI anchors present")
-    print("PASS: RU/HE salon and clinic/dental copy, both channels, pricing, handoff, and test API markers present")
+    print("PASS: RU/HE salon, clinic/dental, and real-estate copy, both channels, pricing, handoff, and test API markers present")
     print("PASS: inline JavaScript passes node --check")
 
 

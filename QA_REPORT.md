@@ -131,3 +131,24 @@ node scripts/browser_smoke.js http://127.0.0.1:8765/
 Проверенный адресный пример:
 
 `/?profile=dental&business=Shenhavit+Dental+Center&city=Bat+Yam&lang=ru`
+
+## Дополнительная проверка real-estate preset — 2026-08-08T08:13:14+03:00
+
+Добавлен `profile=realestate` с отдельными RU/HE-сценариями продавца и покупателя. Профиль собирает тип объекта и желаемое время ответа, но оставляет оценку стоимости, наличие, цену, переговоры и юридические/финансовые вопросы человеку.
+
+Повторно выполнены static verifier, `git diff --check`, JavaScript/Python syntax checks и полный Playwright smoke. Итог: **PASS**.
+
+- исходный salon desktop flow: PASS;
+- исходный mobile touch flow: PASS;
+- clinic/dental preset: PASS;
+- real-estate HE seller qualification: PASS;
+- real-estate HE buyer-to-agent handoff: PASS;
+- переключение real-estate HE RTL → RU LTR: PASS;
+- граница автоматической оценки/цены: PASS;
+- console errors: `0`;
+- failed requests: `0`;
+- external requests: `0`.
+
+Проверенный адресный пример:
+
+`/?profile=realestate&business=Kopel+Realty+Demo&city=Rishon+LeZion&lang=he`

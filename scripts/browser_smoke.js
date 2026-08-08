@@ -271,6 +271,78 @@ async function dentalPresetFlow(browser) {
   };
 }
 
+async function realEstatePresetFlow(browser) {
+  const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, locale: "he-IL" });
+  const page = await context.newPage();
+  const diagnostics = collectDiagnostics(page);
+  const url = new URL(baseUrl);
+  url.searchParams.set("profile", "realestate");
+  url.searchParams.set("business", "Kopel Realty Demo");
+  url.searchParams.set("city", "Rishon LeZion");
+  url.searchParams.set("lang", "he");
+
+  await page.goto(url.toString(), { waitUntil: "networkidle" });
+  await page.locator("#demo").waitFor();
+
+  let state = await page.evaluate(() => window.__KAV_DEMO__.getState());
+  assert.equal(state.profile, "realestate");
+  assert.equal(state.business, "Kopel Realty Demo");
+  assert.equal(state.city, "Rishon LeZion");
+  assert.equal(await page.locator("body").getAttribute("data-profile"), "realestate");
+  assert.equal(await page.locator("html").getAttribute("dir"), "rtl");
+  assert.match(await page.locator(".brand-sub").textContent(), /משרד תיווך/);
+  assert.match(await page.locator("#chatLog").textContent(), /הערכת שווי/);
+  assert.match(await page.locator("#chatLog").textContent(), /דירה או בבית פרטי/);
+  assert.doesNotMatch(await page.locator("#chatLog").textContent(), /תספורת|מרפאה/);
+
+  await page.locator('[data-choice="apartment"]').click();
+  await page.locator('[data-choice="today"]').click();
+  await page.locator('[data-choice="create"]').click();
+  state = await page.evaluate(() => window.__KAV_DEMO__.getState());
+  assert.equal(state.leads[0].status, "new");
+  assert.equal(state.leads[0].detailKey, "detailShoulder");
+  assert.equal(state.leads[0].requestKey, "requestToday1800");
+  assert.match(await page.locator("#ownerView").textContent(), /מכירה \/ הערכת נכס/);
+
+  await page.locator('[data-scenario="handoff"]').click();
+  await page.locator('[data-choice="house"]').click();
+  await page.locator('[data-choice="morning"]').click();
+  await page.locator('[data-choice="handoff"]').click();
+  state = await page.evaluate(() => window.__KAV_DEMO__.getState());
+  assert.equal(state.leads[1].status, "handoff");
+  assert.equal(state.leads[1].detailKey, "detailLong");
+  assert.match(await page.locator("#ownerPrimaryAction").textContent(), /סוכן/);
+
+  await page.locator('[data-lang="ru"]').click();
+  assert.equal(await page.locator("html").getAttribute("dir"), "ltr");
+  assert.match(await page.locator(".brand-sub").textContent(), /недвижимости/);
+  assert.match(await page.locator("#chatLog").textContent(), /цену, документы и условия/);
+  assert.doesNotMatch(await page.locator("#chatLog").textContent(), /стриж|клиник/i);
+
+  const offer = await page.evaluate(() => window.__KAV_DEMO__.getOffer());
+  assert.match(offer, /AI-координатора/);
+  assert.match(offer, /Автоматическая оценка/);
+  assert.match(offer, /₪2,500–5,000/);
+
+  assert.deepEqual(diagnostics.errors, [], `real-estate browser errors: ${diagnostics.errors.join(" | ")}`);
+  assert.deepEqual(diagnostics.failedRequests, [], `real-estate failed requests: ${diagnostics.failedRequests.join(" | ")}`);
+  assert.deepEqual(diagnostics.externalRequests, [], `real-estate external requests: ${diagnostics.externalRequests.join(" | ")}`);
+
+  await context.close();
+  return {
+    profile: "realestate",
+    personalizedBusiness: "PASS",
+    sellerQualification: "PASS",
+    buyerHandoff: "PASS",
+    hebrewRtl: "PASS",
+    russianLtr: "PASS",
+    valuationBoundary: "PASS",
+    consoleErrors: 0,
+    failedRequests: 0,
+    externalRequests: 0,
+  };
+}
+
 (async () => {
   const browser = await chromium.launch({
     executablePath: chromePath,
@@ -281,7 +353,8 @@ async function dentalPresetFlow(browser) {
     const desktop = await desktopFlow(browser);
     const mobile = await mobileFlow(browser);
     const dentalPreset = await dentalPresetFlow(browser);
-    console.log(JSON.stringify({ result: "PASS", desktop, mobile, dentalPreset }, null, 2));
+    const realEstatePreset = await realEstatePresetFlow(browser);
+    console.log(JSON.stringify({ result: "PASS", desktop, mobile, dentalPreset, realEstatePreset }, null, 2));
   } finally {
     await browser.close();
   }
